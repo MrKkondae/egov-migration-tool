@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Logs
+*.log
+
+# Generated files
+converted/*
+output/inventory/*
+output/reports/*
+
+# macOS
+.DS_Store
+
+# VS Code
+.vscode/
+
+# Build
+target/
+build/

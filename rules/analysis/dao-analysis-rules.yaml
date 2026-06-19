@@ -1,0 +1,54 @@
+{
+  "classification_order": [
+    "MANUAL_REVIEW",
+    "RULE_BASED",
+    "AUTO"
+  ],
+  "classifications": {
+    "MANUAL_REVIEW": {
+      "any": [
+        "insert_result_used",
+        "suppress_warnings_unchecked",
+        "mixed_list_and_select_list",
+        "mixed_select_and_select_one",
+        "parse_failed"
+      ]
+    },
+    "RULE_BASED": {
+      "any": [
+        "extends_egov_abstract_dao",
+        "extends_egov_com_abstract_dao",
+        "uses_list",
+        "uses_select"
+      ]
+    },
+    "AUTO": {
+      "all": [
+        "extends_egov_abstract_mapper",
+        "not_uses_list",
+        "not_uses_select",
+        "not_extends_egov_abstract_dao",
+        "not_extends_egov_com_abstract_dao"
+      ]
+    }
+  },
+  "risk_rules": {
+    "High": [
+      "extends_egov_abstract_dao",
+      "extends_egov_com_abstract_dao",
+      "uses_list",
+      "uses_select",
+      "suppress_warnings_unchecked",
+      "parse_failed"
+    ],
+    "Medium": [
+      "insert_result_used",
+      "mixed_list_and_select_list",
+      "mixed_select_and_select_one"
+    ],
+    "Low": [
+      "extends_egov_abstract_mapper",
+      "uses_org_egovframe_abstract_mapper_import"
+    ]
+  }
+}
