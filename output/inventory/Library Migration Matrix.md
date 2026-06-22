@@ -67,9 +67,9 @@
 | 48 | slf4j-log4j12-1.7.x.jar                    | Logging     | Log4j 연동       | 제거   | Logback                          |
 | 49 | spring-aop-4.0.x.jar                       | Spring      | AOP            | 버전업  | Spring 6.x                       |
 | 50 | spring-beans-4.0.x.jar                     | Spring      | Bean 관리        | 버전업  | Spring 6.x                       |
-|  51 | ozenc_utf8.jar                             | Solution   | OZ 암호화/연계       | 확인   | 공급사 확인 필요                       |
+|  51 | ozenc_utf8.jar                             | Solution   | OZ 암호화/연계       | 확인   | OZ Report 프로그램 공급사 확인 필요                       | OZ Report 연계 기능이 존재할 경우 유지 필요, 실제 사용 여부 확인 후 제거, 유지, 대체 결정
 |  52 | pdfbox-1.2.1.jar                          | Utility    | PDF 처리            | 버전업 | pdfbox-2.x                         |
-|  53 | Petra-1.0.0.jar                           | Security   | DB 접근제어/보안      | 확인   | 공급사 확인 필요                       |
+|  53 | Petra-1.0.0.jar                           | Security   | DB 접근제어/보안      | 확인   | DB암호화 Petra 공급사 확인 필요                       | 암호화 라이브러리이므로 개인정보 암호화 요구사항과 연관성이 존재함
 |  54 | quartz-1.6.3.jar                          | Scheduler  | 배치 스케줄링         | 버전업 | quartz-2.3.x                       |
 |  55 | slf4j-api-1.7.7.jar                       | Logging    | Logging API         | 버전업 | slf4j-api-1.7.36                  |
 |  56 | spring-aop-3.2.9.RELEASE.jar              | Spring     | AOP                 | 버전업 | spring-aop-5.3.37                 |
@@ -79,7 +79,7 @@
 |  60 | spring-core-3.2.9.RELEASE.jar             | Spring     | Spring Core         | 버전업 | spring-core-5.3.37                |
 |  61 | spring-expression-3.2.9.RELEASE.jar       | Spring     | SpEL                | 버전업 | spring-expression-5.3.37          |
 |  62 | spring-jdbc-3.2.9.RELEASE.jar             | Spring     | JDBC 처리            | 버전업 | spring-jdbc-5.3.37                |
-|  63 | spring-ldap-1.2.1.jar                     | Spring     | LDAP 연계            | 버전업 | spring-ldap-core                  |
+|  63 | spring-ldap-1.2.1.jar                     | Spring     | LDAP 연계            | 검토 대상 | spring-ldap-core                  |
 |  64 | spring-modules-validation-0.9.jar         | Validation | 검증                 | 대체   | Bean Validation / Hibernate Validator |
 |  65 | spring-orm-3.2.9.RELEASE.jar              | Spring     | ORM 연계             | 버전업 | spring-orm-5.3.37                 |
 |  66 | spring-tx-3.2.9.RELEASE.jar               | Spring     | Transaction         | 버전업 | spring-tx-5.3.37                  |
