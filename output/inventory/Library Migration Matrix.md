@@ -67,26 +67,27 @@
 | 48 | slf4j-log4j12-1.7.x.jar                    | Logging     | Log4j 연동       | 제거   | Logback                          |
 | 49 | spring-aop-4.0.x.jar                       | Spring      | AOP            | 버전업  | Spring 6.x                       |
 | 50 | spring-beans-4.0.x.jar                     | Spring      | Bean 관리        | 버전업  | Spring 6.x                       |
-| 51 | spring-context-4.0.x.jar                   | Spring      | Context        | 버전업  | Spring 6.x                       |
-| 52 | spring-core-4.0.x.jar                      | Spring      | Core           | 버전업  | Spring 6.x                       |
-| 53 | spring-expression-4.0.x.jar                | Spring      | SpEL           | 버전업  | Spring 6.x                       |
-| 54 | spring-jdbc-4.0.x.jar                      | Spring      | JDBC           | 버전업  | Spring 6.x                       |
-| 55 | spring-tx-4.0.x.jar                        | Spring      | Transaction    | 버전업  | Spring 6.x                       |
-| 56 | spring-web-4.0.x.jar                       | Spring      | Web            | 버전업  | Spring 6.x                       |
-| 57 | spring-webmvc-4.0.x.jar                    | Spring      | MVC            | 버전업  | Spring 6.x                       |
-| 58 | taglibs-standard-1.1.x.jar                 | Web         | JSTL           | 대체   | jakarta.servlet.jsp.jstl         |
-| 59 | tiles-api-2.x.jar                          | Web         | 화면구성           | 제거   | Thymeleaf                        |
-| 60 | tiles-core-2.x.jar                         | Web         | 화면구성           | 제거   | Thymeleaf                        |
-| 61 | tiles-jsp-2.x.jar                          | Web         | 화면구성           | 제거   | Thymeleaf                        |
-| 62 | velocity-1.7.jar                           | Template    | 템플릿 엔진         | 제거   | Thymeleaf                        |
-| 63 | xalan-2.x.jar                              | XML         | XSLT           | 검토   | JDK 기본                           |
-| 64 | xercesImpl-2.x.jar                         | XML         | XML Parser     | 검토   | JDK 기본                           |
-| 65 | xml-apis-1.x.jar                           | XML         | XML API        | 제거   | JDK 기본                           |
-| 66 | xmlbeans-2.x.jar                           | XML         | XML Binding    | 버전업  | XMLBeans 최신                      |
-| 67 | activation-1.1.jar                         | Jakarta     | Mail 지원        | 대체   | jakarta.activation               |
-| 68 | mail-1.4.x.jar                             | Jakarta     | 메일             | 대체   | jakarta.mail                     |
-| 69 | servlet-api-2.5.jar                        | Web         | Servlet API    | 대체   | jakarta.servlet-api              |
-| 70 | jsp-api-2.1.jar                            | Web         | JSP API        | 대체   | jakarta.servlet.jsp-api          |
-| 71 | standard.jar                               | Web         | JSTL           | 대체   | jakarta.servlet.jsp.jstl         |
-| 72 | validator-rules.xml 관련 라이브러리               | Validation  | 입력값 검증         | 유지   | Commons Validator                |
-| 73 | xecure-7.jar                               | Security    | 전자서명           | 검토   | Non-ActiveX 대체                   |
+|  51 | ozenc_utf8.jar                             | Solution   | OZ 암호화/연계       | 확인   | 공급사 확인 필요                       |
+|  52 | pdfbox-1.2.1.jar                          | Utility    | PDF 처리            | 버전업 | pdfbox-2.x                         |
+|  53 | Petra-1.0.0.jar                           | Security   | DB 접근제어/보안      | 확인   | 공급사 확인 필요                       |
+|  54 | quartz-1.6.3.jar                          | Scheduler  | 배치 스케줄링         | 버전업 | quartz-2.3.x                       |
+|  55 | slf4j-api-1.7.7.jar                       | Logging    | Logging API         | 버전업 | slf4j-api-1.7.36                  |
+|  56 | spring-aop-3.2.9.RELEASE.jar              | Spring     | AOP                 | 버전업 | spring-aop-5.3.37                 |
+|  57 | spring-beans-3.2.9.RELEASE.jar            | Spring     | Bean 처리            | 버전업 | spring-beans-5.3.37               |
+|  58 | spring-context-3.2.9.RELEASE.jar          | Spring     | Application Context | 버전업 | spring-context-5.3.37             |
+|  59 | spring-context-support-3.2.9.RELEASE.jar  | Spring     | Context 확장         | 버전업 | spring-context-support-5.3.37     |
+|  60 | spring-core-3.2.9.RELEASE.jar             | Spring     | Spring Core         | 버전업 | spring-core-5.3.37                |
+|  61 | spring-expression-3.2.9.RELEASE.jar       | Spring     | SpEL                | 버전업 | spring-expression-5.3.37          |
+|  62 | spring-jdbc-3.2.9.RELEASE.jar             | Spring     | JDBC 처리            | 버전업 | spring-jdbc-5.3.37                |
+|  63 | spring-ldap-1.2.1.jar                     | Spring     | LDAP 연계            | 버전업 | spring-ldap-core                  |
+|  64 | spring-modules-validation-0.9.jar         | Validation | 검증                 | 대체   | Bean Validation / Hibernate Validator |
+|  65 | spring-orm-3.2.9.RELEASE.jar              | Spring     | ORM 연계             | 버전업 | spring-orm-5.3.37                 |
+|  66 | spring-tx-3.2.9.RELEASE.jar               | Spring     | Transaction         | 버전업 | spring-tx-5.3.37                  |
+|  67 | spring-web-3.2.9.RELEASE.jar              | Spring     | Web 기능             | 버전업 | spring-web-5.3.37                 |
+|  68 | spring-webmvc-3.2.9.RELEASE.jar           | Spring     | Spring MVC          | 버전업 | spring-webmvc-5.3.37              |
+|  69 | ST4-4.0.7.jar                             | Utility    | Template Engine     | 검토   | 사용 여부 확인                       |
+|  70 | standard-1.1.2.jar                        | Web        | JSTL 구현            | 대체   | taglibs-standard-impl-1.2.5       |
+|  71 | stringtemplate-3.2.1.jar                  | Utility    | Template Engine     | 검토   | 사용 여부 확인                       |
+|  72 | xdataset-1.0.1.jar                        | Solution   | XPlatform Dataset   | 확인   | 솔루션/업무 사용 확인                 |
+|  73 | xecure-7.jar                              | Security   | 암호화/보안모듈       | 대체/확인 | Java API 전환 또는 공급사 확인       |
+
