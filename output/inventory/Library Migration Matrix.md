@@ -41,32 +41,32 @@
 |  22 | egovframework.rte.fdl.property-3.1.0.jar   | eGov        | Property       | 대체   | org.egovframe.rte.fdl.property   |
 |  23 | egovframework.rte.psl.dataaccess-3.1.0.jar | eGov        | DAO            | 대체   | org.egovframe.rte.psl.dataaccess |
 |  24 | egovframework.rte.ptl.mvc-3.1.0.jar        | eGov        | MVC            | 대체   | org.egovframe.rte.ptl.mvc        |
-| 25 | ehcache-core-2.x.jar                       | Cache       | 캐시             | 버전업  | Ehcache 3.x                      |
-| 26 | gson-2.2.x.jar                             | JSON        | JSON 처리        | 버전업  | Gson 최신                          |
-| 27 | httpclient-4.3.x.jar                       | Network     | HTTP 통신        | 버전업  | HttpClient 5.x                   |
-| 28 | httpcore-4.3.x.jar                         | Network     | HTTP Core      | 버전업  | HttpCore 5.x                     |
-| 29 | ibatis-2.3.x.jar                           | Persistence | ORM            | 대체   | MyBatis 3.x                      |
-| 30 | jackson-core-asl-1.x.jar                   | JSON        | JSON 처리        | 대체   | Jackson 2.x                      |
-| 31 | jackson-mapper-asl-1.x.jar                 | JSON        | JSON Mapping   | 대체   | Jackson Databind                 |
-| 32 | javassist-3.x.jar                          | Utility     | Bytecode       | 버전업  | Javassist 최신                     |
-| 33 | jcl-over-slf4j.jar                         | Logging     | Logging Bridge | 유지   | SLF4J                            |
-| 34 | jdom-1.x.jar                               | XML         | XML 처리         | 검토   | JDOM2                            |
-| 35 | jedis-2.x.jar                              | Cache       | Redis          | 버전업  | Jedis 최신                         |
-| 36 | jsch-0.1.x.jar                             | Network     | SSH/SFTP       | 버전업  | JSch 최신                          |
-| 37 | json-lib-2.x.jar                           | JSON        | JSON 처리        | 대체   | Jackson/Gson                     |
-| 38 | junit-4.x.jar                              | Test        | 단위테스트          | 버전업  | JUnit 5                          |
-| 39 | log4j-1.2.x.jar                            | Logging     | Logging        | 제거   | Logback                          |
-| 40 | log4jdbc-1.2.jar                           | Logging     | SQL Logging    | 검토   | log4jdbc-remix                   |
-| 41 | mybatis-3.x.jar                            | Persistence | ORM            | 유지   | MyBatis 최신                       |
-| 42 | mybatis-spring-1.x.jar                     | Persistence | Spring 연동      | 버전업  | MyBatis-Spring 3.x               |
-| 43 | ojdbc6.jar                                 | Database    | Oracle JDBC    | 버전업  | ojdbc11.jar                      |
-| 44 | poi-3.x.jar                                | Office      | Excel 처리       | 버전업  | Apache POI 최신                    |
-| 45 | poi-ooxml-3.x.jar                          | Office      | Excel OOXML    | 버전업  | Apache POI 최신                    |
-| 46 | quartz-2.x.jar                             | Batch       | Scheduler      | 유지   | Quartz 최신                        |
-| 47 | slf4j-api-1.7.x.jar                        | Logging     | Logging API    | 버전업  | SLF4J 2.x                        |
-| 48 | slf4j-log4j12-1.7.x.jar                    | Logging     | Log4j 연동       | 제거   | Logback                          |
-| 49 | spring-aop-4.0.x.jar                       | Spring      | AOP            | 버전업  | Spring 6.x                       |
-| 50 | spring-beans-4.0.x.jar                     | Spring      | Bean 관리        | 버전업  | Spring 6.x                       |
+|  25 | exportfile-2.0.jar | ETC | 파일 Export | 검토 | 확인 필요 |  |
+|  26 | ibatis-sqlmap-2.3.4.726.jar | Persistence | iBatis | 대체 | MyBatis |  |
+|  27 | icu4j-53.1.jar | Utility | 국제화 | 버전업 | ICU4J |  |
+|  28 | itext-2.1.7.jar | Reporting | PDF | 버전업 | iText/PDFBox |  |
+|  29 | jackcess-2.0.7.jar | Utility | MS Access | 유지 | Jackcess |  |
+|  30 | jackson-core-asl-1.9.13.jar | JSON | JSON | 대체 | Jackson 2.x |  |
+|  31 | jackson-mapper-asl-1.9.13.jar | JSON | JSON | 대체 | Jackson 2.x |  |
+|  32 | jasypt-1.9.2.jar | Security | 암호화 | 유지 | Jasypt |  |
+|  33 | jasypt-spring3-1.9.2.jar | Security | Spring 암호화 | 버전업 | Jasypt Spring Boot |  |
+|  34 | jcaos-client-acrcert-1.4.7.1.jar | Security | 인증서 | 검토 | 확인 필요 |  |
+|  35 | jcl-over-slf4j-1.7.7.jar | Logging | Bridge | 유지 | SLF4J |  |
+|  36 | jdbc-14.jar | DB | Oracle Driver | 대체 | ojdbc8 |  |
+|  37 | jdom-1.0.jar | XML | XML 처리 | 버전업 | JDOM2 |  |
+|  38 | jsch-0.1.54.jar | Utility | SSH/SFTP | 유지 | JSch |  |
+|  39 | jstl-1.2.jar | Web | JSP Tag | 유지 | JSTL |  |
+|  40 | jta-1.1.jar | Transaction | JTA | 유지 | Jakarta/JTA |  |
+|  41 | lib.dstsppdSig-1.1.jar | Security | 전자서명 | 검토 | 확인 필요 |  |
+|  42 | lib_magic_tsaclient-1.1.jar | Security | 전자서명 | 검토 | 확인 필요 |  |
+|  43 | log4j-api-2.3.2.jar | Logging | Log4j | 검토 | Logback 권장 |  |
+|  44 | log4j-core-2.3.2.jar | Logging | Log4j | 검토 | Logback 권장 |  |
+|  45 | log4j-over-slf4j-1.7.7.jar | Logging | Bridge | 유지 | SLF4J |  |
+|  46 | log4j-slf4j-impl-2.3.1.jar | Logging | Bridge | 검토 | Logback 권장 |  |
+|  47 | mail-1.4.jar | Mail | 메일 | 버전업 | JavaMail/Jakarta Mail |  |
+|  48 | mybatis-3.2.7.jar | Persistence | MyBatis | 버전업 | MyBatis 최신 |  |
+|  49 | mybatis-spring-1.2.2.jar | Persistence | MyBatis 연동 | 버전업 | MyBatis Spring |  |
+|  50 | ojdbc14-10.2.0.1.0.jar | DB | Oracle Driver | 대체 | ojdbc8 |  |
 |  51 | ozenc_utf8.jar                             | Solution   | OZ 암호화/연계       | 확인   | OZ Report 프로그램 공급사 확인 필요                       | OZ Report 연계 기능이 존재할 경우 유지 필요, 실제 사용 여부 확인 후 제거, 유지, 대체 결정
 |  52 | pdfbox-1.2.1.jar                          | Utility    | PDF 처리            | 버전업 | pdfbox-2.x                         |
 |  53 | Petra-1.0.0.jar                           | Security   | DB 접근제어/보안      | 확인   | DB암호화 Petra 공급사 확인 필요                       | 암호화 라이브러리이므로 개인정보 암호화 요구사항과 연관성이 존재함
