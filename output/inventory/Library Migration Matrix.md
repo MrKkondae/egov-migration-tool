@@ -26,22 +26,22 @@
 |   7 | commons-1.0.jar                            | Utility     | Commons        | 검토   | 확인 필요                            |
 |   8 | commons-beanutils-1.8.3.jar                | Utility     | Bean 처리        | 버전업  | Commons BeanUtils                |
 |   9 | commons-collections-3.1.jar                | Utility     | Collection     | 버전업  | Commons Collections4             |
-|  10 | commons-dbcp-1.4.jar                       | Persistence | DB Pool        | 대체   | HikariCP                         |
-|  11 | commons-digester-1.8.jar                   | Utility     | XML Parsing    | 검토   | 확인 필요                            |
-|  12 | commons-fileupload-1.3.1.jar               | Web         | 파일업로드          | 버전업  | Commons FileUpload               |
+|  10 | commons-dbcp-1.4.jar                       | Persistence | DB Pool        | 대체   | Tomcat JDBC, Commons DBCP2, PoolHikariCP (Spring Boot)                         |
+|  11 | commons-digester-1.8.jar                   | Utility     | XML Parsing    | 검토대상(제거)   | 확인 필요                            |
+|  12 | commons-fileupload-1.3.1.jar               | Web         | 파일업로드          | 검토  | Commons FileUpload               |
 |  13 | commons-io-2.2.jar                         | Utility     | IO 처리          | 버전업  | Commons IO                       |
 |  14 | commons-lang3-3.3.2.jar                    | Utility     | 문자열            | 버전업  | Commons Lang3                    |
 |  15 | commons-logging-1.1.1.jar                  | Logging     | Logging        | 제거   | SLF4J/Logback                    |
 |  16 | commons-net-3.3.jar                        | Utility     | FTP 등          | 버전업  | Commons Net                      |
 |  17 | commons-pool-1.5.4.jar                     | Persistence | Pool           | 대체   | HikariCP                         |
-|  18 | commons-validator-1.4.0.jar                | Validation  | 검증             | 유지   | Commons Validator                |
+|  18 | commons-validator-1.4.0.jar                | Validation  | 검증             | 검토대상(제거)   | Commons Validator                |
 |  19 | egovframework.rte.fdl.cmmn-3.1.0.jar       | eGov        | 공통기능           | 대체   | org.egovframe.rte.fdl.cmmn       |
 |  20 | egovframework.rte.fdl.idgnr-3.1.0.jar      | eGov        | ID 생성          | 대체   | org.egovframe.rte.fdl.idgnr      |
 |  21 | egovframework.rte.fdl.logging-3.1.0.jar    | eGov        | 로깅             | 대체   | org.egovframe.rte.fdl.logging    |
 |  22 | egovframework.rte.fdl.property-3.1.0.jar   | eGov        | Property       | 대체   | org.egovframe.rte.fdl.property   |
 |  23 | egovframework.rte.psl.dataaccess-3.1.0.jar | eGov        | DAO            | 대체   | org.egovframe.rte.psl.dataaccess |
 |  24 | egovframework.rte.ptl.mvc-3.1.0.jar        | eGov        | MVC            | 대체   | org.egovframe.rte.ptl.mvc        |
-|  25 | exportfile-2.0.jar | ETC | 파일 Export | 검토 | 확인 필요 |  |
+|  25 | exportfile-2.0.jar | ETC | 파일 Export | 검토 | 확인 필요 | SI 프로젝트에서 자체 제작 가능성 높음 | 
 |  26 | ibatis-sqlmap-2.3.4.726.jar | Persistence | iBatis | 대체 | MyBatis |  |
 |  27 | icu4j-53.1.jar | Utility | 국제화 | 버전업 | ICU4J |  |
 |  28 | itext-2.1.7.jar | Reporting | PDF | 버전업 | iText/PDFBox |  |
