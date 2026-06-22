@@ -9,10 +9,8 @@ venv/
 
 # Generated files
 converted/*
-output/inventory/*
-output/reports/*
 
-# macOS
+# Nas
 .DS_Store
 
 # VS Code
