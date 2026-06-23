@@ -41,16 +41,16 @@
 |  22 | egovframework.rte.fdl.property-3.1.0.jar   | eGov        | Property       | 대체   | org.egovframe.rte.fdl.property   |
 |  23 | egovframework.rte.psl.dataaccess-3.1.0.jar | eGov        | DAO            | 대체   | org.egovframe.rte.psl.dataaccess |
 |  24 | egovframework.rte.ptl.mvc-3.1.0.jar        | eGov        | MVC            | 대체   | org.egovframe.rte.ptl.mvc        |
-|  25 | exportfile-2.0.jar | ETC | 파일 Export | 검토 | 확인 필요 | SI 프로젝트에서 자체 제작 가능성 높음 | 
+|  25 | exportfile-2.0.jar | ETC | 연말정산 | 검토 | 확인 필요 | SI 프로젝트에서 자체 제작 가능성 높음 | 
 | 26 | `ibatis-sqlmap-2.3.4.726.jar` | Persistence | SQL Mapper | 대체 | `mybatis-3.5.x` + `mybatis-spring-2.1.x` / `org.egovframe.rte.psl.dataaccess` | iBatis 사용 범위 확인 후 MyBatis로 통합 전환 필요. `SqlMapClient`, `SqlMapClientTemplate`, `<sqlMap>`, `resultClass`, `parameterClass` 사용 여부 점검 |
 | 27 | `icu4j-53.1.jar` | Utility | 국제화 / 문자 처리 | 버전업 | `icu4j` 최신 JDK8 호환 버전 | 유니코드, 로케일, 날짜/문자 처리용. 직접 사용 여부 확인 후 eGov 4.3 환경에서 호환 버전 적용 |
-| 28 | `itext-2.1.7.jar` | Document | PDF 생성 / 편집 | 대체 | `OpenPDF 1.3.x` 또는 상용 `iText 7` | iText 3.x 이상은 AGPL 라이선스 이슈가 있어 공공기관은 OpenPDF 우선 검토 권장. OpenPDF는 `com.lowagie.text` 패키지 유지로 전환 부담 낮음 |
+| 28 | `itext-2.1.7.jar` | Document | 연말정산, PDF 생성 / 편집 | 대체 | `OpenPDF 1.3.x` 또는 상용 `iText 7` | iText 3.x 이상은 AGPL 라이선스 이슈가 있어 공공기관은 OpenPDF 우선 검토 권장. OpenPDF는 `com.lowagie.text` 패키지 유지로 전환 부담 낮음 |
 | 29 | `jackcess-2.0.7.jar` | Document / Data | MS Access 파일 처리 | 버전업 / 검토 | `jackcess` 최신 JDK8 호환 버전 | `.mdb`, `.accdb` 파일 사용 여부 확인. 실제 사용하지 않으면 제거 검토 가능 |
 | 30 | `jackson-core-asl-1.9.13.jar` | JSON | JSON Core | 대체 | `com.fasterxml.jackson.core:jackson-core:2.x` | Jackson 1.x 계열에서 2.x 계열로 변경. `org.codehaus.jackson` → `com.fasterxml.jackson` import 변경 필요 |
 | 31 | `jackson-mapper-asl-1.9.13.jar` | JSON | JSON Mapping | 대체 | `com.fasterxml.jackson.core:jackson-databind:2.x` + `jackson-annotations` | JSON ↔ Java 객체 매핑용. Spring MVC 설정에 `MappingJacksonHttpMessageConverter`가 있으면 `MappingJackson2HttpMessageConverter`로 변경 필요 |
 | 32 | `jasypt-1.9.2.jar` | Security | 문자열 / Property 암호화 | 버전업 / 검토 | `jasypt-1.9.3` 또는 호환 설정 유지 | 암호화 알고리즘, 키 관리 방식, 운영 환경변수 관리 방식 확인 필요. 암호화/복호화 회귀 테스트 필수 |
 | 33 | `jasypt-spring3-1.9.2.jar` | Security / Spring | Spring 암호화 연계 | 대체 / 검토 | `jasypt-spring31` 수동 Bean 설정 또는 Spring Boot 전환 시 `jasypt-spring-boot` | Jasypt 공식 1.9.x 라인에는 Spring 5 전용 모듈이 없음. XML 기반 Spring MVC 환경에서는 수동 Bean 설정 방식 검토 |
-| 34 | `jcaos-client-arccert-1.4.7.1.jar` | Security | 인증서 / GPKI 추정 | 검토 | 공급사 최신 JDK8/WAS 호환 버전 | 사설/국산 인증서 모듈 가능성. GPKI, 인증서 로그인, ActiveX 제거 영향, 폐쇄망 반입 파일, 라이선스 확인 필요 |
+| 34 | `jcaos-client-arccert-1.4.7.1.jar` | Security | 연말정산, 인증서 / GPKI 추정 | 검토 | 공급사 최신 JDK8/WAS 호환 버전 | 사설/국산 인증서 모듈 가능성. GPKI, 인증서 로그인, ActiveX 제거 영향, 폐쇄망 반입 파일, 라이선스 확인 필요 |
 | 35 | `jcl-over-slf4j-1.7.7.jar` | Logging | Commons Logging → SLF4J Bridge | 버전업 | `jcl-over-slf4j-1.7.36` 또는 eGov 4.3 검증 버전 | Commons Logging 호출을 SLF4J로 전달. `commons-logging.jar`와 중복 구성 여부 확인 필요 |
 | 36 | `jdbc-14.jar` | Persistence | Oracle JDBC 추정 | 대체 / 검토 | `ojdbc8` 단일 적용 | `ojdbc14-10.2.0.1.0.jar`와 중복 가능성 큼. JAR Manifest 확인 후 Oracle JDBC 드라이버는 하나로 정리 필요 |
 | 37 | `jdom-1.0.jar` | XML | XML 처리 | 대체 / 버전업 | `org.jdom:jdom2:2.x` | JDOM 1.x → JDOM2 전환 시 패키지와 API 변경 가능. XML 생성/파싱 사용 소스 확인 필요 |
@@ -68,7 +68,7 @@
 | 49 | `mybatis-spring-1.2.2.jar` | Persistence | MyBatis-Spring 연계 | 버전업 | `mybatis-spring-2.1.x` | Spring 5 호환 버전 필요. MyBatis 3.5.x 이상과 함께 적용하고 `SqlSessionFactoryBean`, `MapperScannerConfigurer` 설정 확인 |
 | 50 | `ojdbc14-10.2.0.1.0.jar` | Persistence | Oracle JDBC Driver | 대체 | `ojdbc8` 단일 적용 | JDK8 기준 `ojdbc8`로 정리 권장. `jdbc-14.jar`와 중복 제거, DB/WAS 공통 lib 중복 확인, 드라이버 클래스 `oracle.jdbc.OracleDriver` 적용 확인 |
 |  51 | ozenc_utf8.jar                             | Solution   | OZ 암호화/연계       | 대상아님   | OZ Report 프로그램 공급사 확인 필요                       | OZ Report 연계 기능이 존재할 경우 유지 필요, 실제 사용 여부 확인 후 제거, 유지, 대체 결정
-|  52 | pdfbox-1.2.1.jar                          | Utility    | PDF 처리            | 버전업 | pdfbox-2.x                         |
+|  52 | pdfbox-1.2.1.jar                          | Utility    | 연말정산, PDF 처리            | 버전업 | pdfbox-2.x                         |
 |  53 | Petra-1.0.0.jar                           | Security   | DB 접근제어/보안      | 확인   | DB암호화 Petra 공급사 확인 필요                       | 암호화 라이브러리이므로 개인정보 암호화 요구사항과 연관성이 존재함 ,JDK 8 이상 호환성 검증, 암호화 알고리즘 지원 여부 확인, 개인정보 암호화 기능 검증, 인터페이스 연계 데이터 암호화 검증
 |  54 | quartz-1.6.3.jar                          | Scheduler  | 배치 스케줄링         | 버전업 | quartz-2.3.x                       | JobDetail 생성 방식 변경, TriggerBuilder 적용, JobBuilder 적용, Scheduler API 변경, Listener API 변경, CronTrigger API 변경, Spring 연계 방식 개선
 |  55 | slf4j-api-1.7.7.jar                       | Logging    | Logging API         | 버전업 | slf4j-api-1.7.36                  | jcl-over-slf4j, log4j-over-slf4j, log4j-slf4j-impl 버전 확인, Log4j 1.x 사용 여부 확인, Commons Logging 중복 여부 확인, Classpath 내 SLF4J Binding 중복 여부 확인, log4j2.xml, logback.xml, log4j.properties 설정 파일 확인
