@@ -44,8 +44,7 @@
 |  25 | exportfile-2.0.jar | ETC | 연말정산 | 검토 | 확인 필요 | SI 프로젝트에서 자체 제작 가능성 높음 | 
 | 26 | `ibatis-sqlmap-2.3.4.726.jar` | Persistence | SQL Mapper | 대체 | `mybatis-3.5.x` + `mybatis-spring-2.1.x` / `org.egovframe.rte.psl.dataaccess` | iBatis 사용 범위 확인 후 MyBatis로 통합 전환 필요. `SqlMapClient`, `SqlMapClientTemplate`, `<sqlMap>`, `resultClass`, `parameterClass` 사용 여부 점검 |
 | 27 | `icu4j-53.1.jar` | Utility | 국제화 / 문자 처리 | 버전업 | `icu4j` 최신 JDK8 호환 버전 | 유니코드, 로케일, 날짜/문자 처리용. 직접 사용 여부 확인 후 eGov 4.3 환경에서 호환 버전 적용 |
-| 28 | `itext-2.1.7.jar` | Document | 연말정산, PDF 생성 / 편집 | 대체 | `OpenPDF 1.3.x` 또는 상용 `iText 7` | iText 5.x(2009년)부터 AGPL로 전환됨 (iText 3.x 공개 배포 버전 미존재).
-         현재 사용 중인 2.1.7도 IP 불명확성 이슈로 유지 부적합.  OpenPDF(LGPL/MPL, com.lowagie.text 패키지 유지)는 소스 수정 없이 전환 가능하여 1순위 대안. |
+| 28 | `itext-2.1.7.jar` | Document | 연말정산, PDF 생성 / 편집 | 대체 | `OpenPDF 1.3.x` 또는 상용 `iText 7` | iText 5.x(2009년)부터 AGPL로 전환됨 (iText 3.x 공개 배포 버전 미존재). 현재 사용 중인 2.1.7도 IP 불명확성 이슈로 유지 부적합.  OpenPDF(LGPL/MPL, com.lowagie.text 패키지 유지)는 소스 수정 없이 전환 가능하여 1순위 대안. |
 | 29 | `jackcess-2.0.7.jar` | Document / Data | MS Access 파일 처리 | 버전업 / 검토 | `jackcess` 최신 JDK8 호환 버전 | `.mdb`, `.accdb` 파일 사용 여부 확인. 실제 사용하지 않으면 제거 검토 가능 |
 | 30 | `jackson-core-asl-1.9.13.jar` | JSON | JSON Core | 대체 | `com.fasterxml.jackson.core:jackson-core:2.x` | Jackson 1.x 계열에서 2.x 계열로 변경. `org.codehaus.jackson` → `com.fasterxml.jackson` import 변경 필요 |
 | 31 | `jackson-mapper-asl-1.9.13.jar` | JSON | JSON Mapping | 대체 | `com.fasterxml.jackson.core:jackson-databind:2.x` + `jackson-annotations` | JSON ↔ Java 객체 매핑용. Spring MVC 설정에 `MappingJacksonHttpMessageConverter`가 있으면 `MappingJackson2HttpMessageConverter`로 변경 필요 |
