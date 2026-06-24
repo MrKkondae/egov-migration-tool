@@ -1,0 +1,56 @@
+type: specs.openrewrite.org/v1beta/recipe
+name: egov.migration.phase1.pom.EgovframeCoordinates
+displayName: eGovFrame 3.1 to 4.3 - eGovFrame Coordinates
+description: >
+  High-confidence 1:1 Maven coordinate migration for eGovFrame RTE
+  dependencies from eGovFrame 3.1 to 4.3. This recipe is safe for direct
+  dependencies and dependencyManagement entries.
+
+recipeList:
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: egovframework.rte
+      oldArtifactId: egovframework.rte.fdl.cmmn
+      newGroupId: org.egovframe.rte
+      newArtifactId: org.egovframe.rte.fdl.cmmn
+      newVersion: "4.3.0"
+      changeManagedDependency: true
+
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: egovframework.rte
+      oldArtifactId: egovframework.rte.fdl.idgnr
+      newGroupId: org.egovframe.rte
+      newArtifactId: org.egovframe.rte.fdl.idgnr
+      newVersion: "4.3.0"
+      changeManagedDependency: true
+
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: egovframework.rte
+      oldArtifactId: egovframework.rte.fdl.logging
+      newGroupId: org.egovframe.rte
+      newArtifactId: org.egovframe.rte.fdl.logging
+      newVersion: "4.3.0"
+      changeManagedDependency: true
+
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: egovframework.rte
+      oldArtifactId: egovframework.rte.fdl.property
+      newGroupId: org.egovframe.rte
+      newArtifactId: org.egovframe.rte.fdl.property
+      newVersion: "4.3.0"
+      changeManagedDependency: true
+
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: egovframework.rte
+      oldArtifactId: egovframework.rte.psl.dataaccess
+      newGroupId: org.egovframe.rte
+      newArtifactId: org.egovframe.rte.psl.dataaccess
+      newVersion: "4.3.0"
+      changeManagedDependency: true
+
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: egovframework.rte
+      oldArtifactId: egovframework.rte.ptl.mvc
+      newGroupId: org.egovframe.rte
+      newArtifactId: org.egovframe.rte.ptl.mvc
+      newVersion: "4.3.0"
+      changeManagedDependency: true

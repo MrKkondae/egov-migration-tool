@@ -1,0 +1,32 @@
+type: specs.openrewrite.org/v1beta/recipe
+name: egov.migration.phase1.pom.SafeCommonVersionUpgrades
+displayName: eGovFrame 3.1 to 4.3 - Safe Common Version Upgrades
+description: >
+  Conservative version upgrades for common utility libraries that are usually
+  safe to manage at pom.xml level. Source compatibility should still be
+  regression-tested after rewrite:dryRun and build verification.
+
+recipeList:
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: commons-beanutils
+      artifactId: commons-beanutils
+      newVersion: "1.9.4"
+      overrideManagedVersion: false
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: commons-io
+      artifactId: commons-io
+      newVersion: "2.15.1"
+      overrideManagedVersion: false
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.apache.commons
+      artifactId: commons-lang3
+      newVersion: "3.12.0"
+      overrideManagedVersion: false
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: commons-net
+      artifactId: commons-net
+      newVersion: "3.9.0"
+      overrideManagedVersion: false

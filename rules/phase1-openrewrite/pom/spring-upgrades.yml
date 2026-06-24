@@ -1,0 +1,73 @@
+type: specs.openrewrite.org/v1beta/recipe
+name: egov.migration.phase1.pom.SpringUpgrades
+displayName: eGovFrame 3.1 to 4.3 - Spring Upgrades
+description: >
+  Conservative Spring Framework dependency upgrades for Spring 5.3.37.
+  Versions are upgraded only for dependencies already present in pom.xml.
+
+recipeList:
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.springframework
+      artifactId: spring-aop
+      newVersion: "5.3.37"
+      overrideManagedVersion: false
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.springframework
+      artifactId: spring-beans
+      newVersion: "5.3.37"
+      overrideManagedVersion: false
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.springframework
+      artifactId: spring-context
+      newVersion: "5.3.37"
+      overrideManagedVersion: false
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.springframework
+      artifactId: spring-context-support
+      newVersion: "5.3.37"
+      overrideManagedVersion: false
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.springframework
+      artifactId: spring-core
+      newVersion: "5.3.37"
+      overrideManagedVersion: false
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.springframework
+      artifactId: spring-expression
+      newVersion: "5.3.37"
+      overrideManagedVersion: false
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.springframework
+      artifactId: spring-jdbc
+      newVersion: "5.3.37"
+      overrideManagedVersion: false
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.springframework
+      artifactId: spring-orm
+      newVersion: "5.3.37"
+      overrideManagedVersion: false
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.springframework
+      artifactId: spring-tx
+      newVersion: "5.3.37"
+      overrideManagedVersion: false
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.springframework
+      artifactId: spring-web
+      newVersion: "5.3.37"
+      overrideManagedVersion: false
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.springframework
+      artifactId: spring-webmvc
+      newVersion: "5.3.37"
+      overrideManagedVersion: false

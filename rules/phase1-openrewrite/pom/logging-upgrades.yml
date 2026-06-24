@@ -1,0 +1,44 @@
+type: specs.openrewrite.org/v1beta/recipe
+name: egov.migration.phase1.pom.LoggingUpgrades
+displayName: eGovFrame 3.1 to 4.3 - Logging Upgrades
+description: >
+  Conservative logging dependency upgrades for SLF4J and Log4j2 alignment.
+  This recipe upgrades existing logging artifacts only and does not remove or
+  add bridges automatically.
+
+recipeList:
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.slf4j
+      artifactId: slf4j-api
+      newVersion: "1.7.36"
+      overrideManagedVersion: false
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.slf4j
+      artifactId: jcl-over-slf4j
+      newVersion: "1.7.36"
+      overrideManagedVersion: false
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.slf4j
+      artifactId: log4j-over-slf4j
+      newVersion: "1.7.36"
+      overrideManagedVersion: false
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.apache.logging.log4j
+      artifactId: log4j-api
+      newVersion: "2.17.1"
+      overrideManagedVersion: false
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.apache.logging.log4j
+      artifactId: log4j-core
+      newVersion: "2.17.1"
+      overrideManagedVersion: false
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.apache.logging.log4j
+      artifactId: log4j-slf4j-impl
+      newVersion: "2.17.1"
+      overrideManagedVersion: false
