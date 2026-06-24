@@ -1,0 +1,67 @@
+type: specs.openrewrite.org/v1beta/recipe
+name: egov.migration.phase1.java.JacksonTypeMigration
+displayName: eGovFrame 3.1 to 4.3 - Jackson Type Migration
+description: >
+  Conservative Jackson 1.x to 2.x Java source migration.
+  Only well-known package and type replacements are included. This recipe
+  intentionally excludes serializer/deserializer logic rewrites and other
+  behavior-affecting API migrations.
+
+recipeList:
+  ###########################################################################
+  # Annotation package moves
+  ###########################################################################
+
+  - org.openrewrite.java.ChangePackage:
+      oldPackageName: org.codehaus.jackson.annotate
+      newPackageName: com.fasterxml.jackson.annotation
+      recursive: true
+
+  - org.openrewrite.java.ChangePackage:
+      oldPackageName: org.codehaus.jackson.map.annotate
+      newPackageName: com.fasterxml.jackson.databind.annotation
+      recursive: true
+
+  ###########################################################################
+  # Common Jackson core / mapper type moves
+  ###########################################################################
+
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: org.codehaus.jackson.map.ObjectMapper
+      newFullyQualifiedTypeName: com.fasterxml.jackson.databind.ObjectMapper
+
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: org.codehaus.jackson.JsonNode
+      newFullyQualifiedTypeName: com.fasterxml.jackson.databind.JsonNode
+
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: org.codehaus.jackson.JsonFactory
+      newFullyQualifiedTypeName: com.fasterxml.jackson.core.JsonFactory
+
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: org.codehaus.jackson.JsonParser
+      newFullyQualifiedTypeName: com.fasterxml.jackson.core.JsonParser
+
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: org.codehaus.jackson.JsonGenerator
+      newFullyQualifiedTypeName: com.fasterxml.jackson.core.JsonGenerator
+
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: org.codehaus.jackson.JsonToken
+      newFullyQualifiedTypeName: com.fasterxml.jackson.core.JsonToken
+
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: org.codehaus.jackson.type.TypeReference
+      newFullyQualifiedTypeName: com.fasterxml.jackson.core.type.TypeReference
+
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: org.codehaus.jackson.annotate.JsonIgnoreProperties
+      newFullyQualifiedTypeName: com.fasterxml.jackson.annotation.JsonIgnoreProperties
+
+  ###########################################################################
+  # Java-based Spring MVC converter usage
+  ###########################################################################
+
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: org.springframework.http.converter.json.MappingJacksonHttpMessageConverter
+      newFullyQualifiedTypeName: org.springframework.http.converter.json.MappingJackson2HttpMessageConverter

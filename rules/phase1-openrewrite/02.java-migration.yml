@@ -1,0 +1,46 @@
+type: specs.openrewrite.org/v1beta/recipe
+name: egov.migration.phase1.JavaMigration
+displayName: eGovFrame 3.1 to 4.3 - Java Migration
+description: >
+  Composite Java source migration recipe for eGovFrame 3.1 to 4.3.
+  This phase only includes conservative package and type changes that can be
+  inferred safely without access to the closed-network source code.
+
+recipeList:
+  - egov.migration.phase1.java.EgovPackageRenames
+  - egov.migration.phase1.java.JacksonTypeMigration
+
+  ###########################################################################
+  # Deferred candidates for later review
+  #
+  # The following Java migrations are intentionally excluded from phase 1
+  # auto-conversion because source code is not currently available and the
+  # risk of semantic breakage is higher than simple import/type replacement.
+  #
+  # - Commons DBCP type migration
+  #   Example: org.apache.commons.dbcp.BasicDataSource
+  #         -> org.apache.commons.dbcp2.BasicDataSource
+  #   Review points:
+  #   * XML bean class / factory class changes are coupled
+  #   * DataSource property compatibility must be verified
+  #
+  # - EgovAbstractDAO -> EgovAbstractMapper migration
+  #   Review points:
+  #   * iBatis / MyBatis coexistence must be identified first
+  #   * DAO base class replacement may require code-level refactoring
+  #
+  # - Log4j 1.x Logger -> SLF4J Logger migration
+  #   Review points:
+  #   * LoggerFactory introduction and field initialization changes required
+  #   * Method call patterns should be reviewed project-wide
+  #
+  # - JDOM 1.x -> JDOM2 type migration
+  #   Review points:
+  #   * org.jdom -> org.jdom2 import replacement is easy
+  #   * XPath, Namespace, output format and related API differences remain
+  #
+  # - Method name / invocation rewrites
+  #   Review points:
+  #   * excluded from phase 1 by policy
+  #   * require real source-based verification before automation
+  ###########################################################################

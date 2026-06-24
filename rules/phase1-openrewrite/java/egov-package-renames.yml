@@ -1,0 +1,14 @@
+type: specs.openrewrite.org/v1beta/recipe
+name: egov.migration.phase1.java.EgovPackageRenames
+displayName: eGovFrame 3.1 to 4.3 - eGov Package Renames
+description: >
+  Conservative Java package renames for eGovFrame runtime classes.
+  This recipe renames egovframework.rte.* imports and fully-qualified type
+  usages to org.egovframe.rte.* recursively. It does not alter method names
+  or DAO implementation patterns.
+
+recipeList:
+  - org.openrewrite.java.ChangePackage:
+      oldPackageName: egovframework.rte
+      newPackageName: org.egovframe.rte
+      recursive: true
