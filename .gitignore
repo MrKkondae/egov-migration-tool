@@ -19,3 +19,9 @@ converted/*
 # Build
 target/
 build/
+
+# temp
+tmp/
+
+# output/reports/
+output/reports/

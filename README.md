@@ -289,72 +289,165 @@ converted/phase1/
 
 ### 특징
 
-* 코드 구조 변경 필요
-* 규칙은 명확
-* OpenRewrite만으로 부족
+* 코드 구조 변경이 필요한 영역을 다룬다
+* OpenRewrite 단독으로는 부족하고 Python 변환 프로그램이 주도한다
+* OpenRewrite는 저위험 치환과 사전 정리 작업으로 병행한다
+* 변환 후 잔존 패턴 탐지와 검증 자동화가 함께 필요하다
 
 ### 수행 도구
 
 * Python
 * OpenRewrite 일부
 
-### 대상
+### 수행 방식
 
-#### DAO
+Phase 2는 `Python Rule Engine` 단독 단계가 아니라, 아래와 같은 역할 분리로 수행한다.
+
+* Python
+  iBatis/MyBatis 판별, DAO/SQL Map/Spring XML 구조 변환, 잔존 패턴 스캔, 후처리 대상 분류
+* OpenRewrite
+  Java/XML의 저위험 package/type/name 치환, pom 선행 정리
+* 검증 스크립트
+  컴파일 로그, 잔존 구문, mapper/DAO 연결 불일치 탐지
+
+### 규칙 변환 대상
+
+#### 1. Python 주도 핵심 변환
+
+##### DAO
 
 ```java
 extends EgovAbstractDAO
+```
+
 →
+
+```java
 extends EgovAbstractMapper
 ```
 
-#### Import
+단, 실제로는 단순 상속 변경만이 아니라 아래를 함께 검토해야 한다.
 
-```java
-egovframework.*
-→
-org.egovframe.*
-```
+* `EgovComAbstractDAO` 같은 프로젝트 공통 DAO 래퍼 존재 여부
+* `list()`, `select()`, `insert()`, `update()`, `delete()` 호출 패턴
+* `SqlMapClient`, `SqlMapClientTemplate` 사용 여부
 
-#### SQL Map
+##### SQL Map / MyBatis XML
 
 ```xml
 #id#
+```
+
 →
+
+```xml
 #{id}
 ```
 
-#### MyBatis
+```xml
+<sqlMap>
+```
+
+→
 
 ```xml
-sqlMap
-→
-mapper
+<mapper>
 ```
+
+이 영역은 아래와 같은 iBatis 문법 변환을 포함한다.
+
+* `#var#`, `$var$`
+* `<dynamic>`, `<isNotEmpty>`, `<isEqual>`, `<iterate>`
+* `parameterClass`, `resultClass`
+* namespace / statement id / resultMap 구조 정리
+
+##### Spring XML의 iBatis 연계 설정
+
+```xml
+org.springframework.orm.ibatis.SqlMapClientFactoryBean
+```
+
+→
+
+```xml
+org.mybatis.spring.SqlSessionFactoryBean
+```
+
+단, 이 항목은 bean class 이름 치환만으로 끝나지 않는다.
+
+* bean id 변경 여부
+* `configLocation` / `mapperLocations` 구조 변경
+* DAO / mapper XML / Spring bean 참조 관계 동시 정리
+
+#### 2. OpenRewrite 병행 대상
+
+Python 변환과 별도로, 아래 항목은 OpenRewrite를 함께 적용하는 것이 효율적이다.
+
+* `egovframework.rte.*` → `org.egovframe.rte.*` Java/XML 잔존분 정리
+* Jackson 1.x → 2.x Java/XML 치환
+* pom 의존성 좌표/버전 선행 정리
+
+주의:
+`egovframework.*` 전체를 일괄 `org.egovframe.*`로 바꾸는 것은 대상이 아니다.
+Phase 2에서 OpenRewrite가 다루는 것은 기본적으로 `egovframework.rte.*` 계열의 잔존분이다.
+
+#### 3. Python 후처리 / 검증 대상
+
+OpenRewrite 또는 Python 변환 직후, 아래 검증을 Python 프로그램으로 함께 수행해야 한다.
+
+* `EgovAbstractDAO`, `EgovComAbstractDAO` 잔존 여부 탐지
+* `SqlMapClientFactoryBean`, `SqlMapClientTemplate` 잔존 여부 탐지
+* `#...#`, `<dynamic>`, `<isNotEmpty>`, `<iterate>` 등 iBatis XML 잔존 패턴 탐지
+* DAO class / mapper namespace / statement id 연결 불일치 탐지
+* 변환 결과를 `자동 수정 가능`, `LLM 보정 필요`, `수동 검토 필요`로 분류
+
+### Phase 2 후보 중 후순위 항목
+
+아래 항목은 규칙 기반 변환 후보이지만, Phase 2 핵심 자동화 범위와는 분리해서 보는 것이 안전하다.
 
 #### Validation
 
 ```java
 spring-modules-validation
+```
+
 →
+
+```java
 Bean Validation
 ```
+
+이 항목은 Java만이 아니라 아래를 함께 다뤄야 한다.
+
+* `DefaultBeanValidator`
+* `validator-rules.xml`
+* `validation.xml`
+* VO annotation 전환
+
+따라서 `Phase 2 후보 + Phase 3/수동 보정 연계` 대상으로 관리한다.
 
 #### Quartz
 
 ```text
 Quartz 1.x
+```
+
 →
+
+```text
 Quartz 2.x
 ```
+
+Quartz는 API, job 설정, trigger 설정 차이 검토가 필요하므로 공통 규칙만으로 끝나지 않을 수 있다.
+따라서 `Phase 2 후보 + 개별 검토` 대상으로 둔다.
 
 ### 산출물
 
 ```text
 converted/phase2/
+output/reports/
+output/logs/
 ```
-
----
 
 ## Phase 3 : LLM 예외 보정
 

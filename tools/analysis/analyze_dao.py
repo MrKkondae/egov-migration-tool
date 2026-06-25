@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import re
 from collections import Counter, defaultdict
 from pathlib import Path
@@ -9,6 +10,7 @@ from typing import Any
 
 DEFAULT_SOURCE = Path("samples/asis")
 DEFAULT_OUTPUT = Path("output/reports/dao-pattern-analysis.md")
+DEFAULT_JSON_OUTPUT = Path("output/reports/dao-pattern-analysis.json")
 
 JAVA_KEYWORDS = {
     "if",
@@ -71,6 +73,11 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Collect AS-IS DAO patterns from Java sources.")
     parser.add_argument("--source", default=str(DEFAULT_SOURCE), help="Directory to scan for Java files.")
     parser.add_argument("--output", default=str(DEFAULT_OUTPUT), help="Markdown report output path.")
+    parser.add_argument(
+        "--json-output",
+        default=str(DEFAULT_JSON_OUTPUT),
+        help="JSON report output path.",
+    )
     return parser.parse_args()
 
 
@@ -525,10 +532,42 @@ def write_report(output_path: Path, markdown: str) -> None:
     output_path.write_text(markdown, encoding="utf-8")
 
 
+def normalize_json_value(value: Any) -> Any:
+    if isinstance(value, Counter):
+        return dict(value)
+    if isinstance(value, defaultdict):
+        return {key: normalize_json_value(item) for key, item in value.items()}
+    if isinstance(value, dict):
+        return {key: normalize_json_value(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [normalize_json_value(item) for item in value]
+    return value
+
+
+def build_json_report(source_dir: Path, results: list[dict], summary: dict) -> dict[str, Any]:
+    dao_results = [item for item in results if item["dao_candidate"]]
+    return {
+        "source": str(source_dir),
+        "analyzed_file_count": len(results),
+        "dao_candidate_count": len(dao_results),
+        "summary": normalize_json_value(summary),
+        "dao_candidates": [normalize_json_value(item) for item in dao_results],
+    }
+
+
+def write_json_report(output_path: Path, payload: dict[str, Any]) -> None:
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+
+
 def main() -> None:
     args = parse_args()
     source_dir = Path(args.source).expanduser().resolve()
     output_path = Path(args.output).expanduser().resolve()
+    json_output_path = Path(args.json_output).expanduser().resolve()
 
     if not source_dir.exists() or not source_dir.is_dir():
         raise SystemExit(f"Source directory not found: {source_dir}")
@@ -538,6 +577,7 @@ def main() -> None:
     summary = summarize_patterns(results)
     markdown = generate_markdown_report(results, summary)
     write_report(output_path, markdown)
+    write_json_report(json_output_path, build_json_report(source_dir, results, summary))
 
     print("DAO pattern analysis completed.")
     print(f"Java files: {summary['total_java_files']}")
@@ -545,6 +585,7 @@ def main() -> None:
     print(f"Extends classes: {len(summary['extends_counter'])}")
     print(f"Suspicious DAO API calls: {len(summary['suspect_counter'])}")
     print(f"Report: {output_path}")
+    print(f"JSON report: {json_output_path}")
 
 
 if __name__ == "__main__":

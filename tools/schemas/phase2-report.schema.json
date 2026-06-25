@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Phase2Report",
+  "type": "object",
+  "required": [
+    "source_root",
+    "working_root",
+    "summary",
+    "transform_results",
+    "warnings",
+    "manual_review"
+  ],
+  "properties": {
+    "source_root": {
+      "type": "string"
+    },
+    "working_root": {
+      "type": "string"
+    },
+    "summary": {
+      "type": "object"
+    },
+    "transform_results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "path",
+          "changed",
+          "change_count",
+          "warnings"
+        ],
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "changed": {
+            "type": "boolean"
+          },
+          "change_count": {
+            "type": "integer"
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "manual_review": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

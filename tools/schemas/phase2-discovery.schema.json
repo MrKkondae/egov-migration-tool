@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Phase2Discovery",
+  "type": "object",
+  "required": [
+    "source_root",
+    "working_root",
+    "file_counts",
+    "findings",
+    "classifications"
+  ],
+  "properties": {
+    "source_root": {
+      "type": "string"
+    },
+    "working_root": {
+      "type": "string"
+    },
+    "file_counts": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "integer"
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "category",
+          "path",
+          "message"
+        ],
+        "properties": {
+          "category": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
+          "line": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "snippet": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "classifications": {
+      "type": "object",
+      "required": [
+        "ibatis_only",
+        "mybatis_only",
+        "mixed_persistence",
+        "dao_wrapper_present",
+        "manual_review_required"
+      ],
+      "properties": {
+        "ibatis_only": {
+          "type": "boolean"
+        },
+        "mybatis_only": {
+          "type": "boolean"
+        },
+        "mixed_persistence": {
+          "type": "boolean"
+        },
+        "dao_wrapper_present": {
+          "type": "boolean"
+        },
+        "manual_review_required": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}
