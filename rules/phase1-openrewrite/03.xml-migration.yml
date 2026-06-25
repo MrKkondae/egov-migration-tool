@@ -1,0 +1,35 @@
+type: specs.openrewrite.org/v1beta/recipe
+name: egov.migration.phase1.XmlMigration
+displayName: eGovFrame 3.1 to 4.3 - XML Migration
+description: >
+  Composite XML migration recipe for eGovFrame 3.1 to 4.3.
+  This phase only includes conservative text-level XML changes that are
+  considered low risk without project-specific runtime verification.
+
+recipeList:
+  - egov.migration.phase1.xml.EgovXmlPackageRenames
+  - egov.migration.phase1.xml.JacksonXmlMigration
+
+  ###########################################################################
+  # Deferred candidates for later review
+  #
+  # The following XML migrations are intentionally excluded from phase 1
+  # auto-conversion because bean wiring, configuration structure, or runtime
+  # behavior may change beyond a safe text replacement.
+  #
+  # - iBatis SqlMapClientFactoryBean -> MyBatis SqlSessionFactoryBean
+  #   Review points:
+  #   * bean id / referenced bean names may change together
+  #   * configLocation vs mapperLocations structure must be redesigned
+  #   * sql-map XML and DAO implementation migration must be coordinated
+  #
+  # - Commons DBCP BasicDataSource -> DBCP2 BasicDataSource
+  #   Review points:
+  #   * bean class replacement is easy, but property compatibility varies
+  #   * pool sizing / validation property names should be verified
+  #
+  # - Spring Modules DefaultBeanValidator related XML removal
+  #   Review points:
+  #   * validator-rules.xml and validation.xml usage must be analyzed first
+  #   * Bean Validation annotation migration is not a text-only rewrite
+  ###########################################################################

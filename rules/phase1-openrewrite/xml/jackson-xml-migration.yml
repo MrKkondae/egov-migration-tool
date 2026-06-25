@@ -1,0 +1,13 @@
+type: specs.openrewrite.org/v1beta/recipe
+name: egov.migration.phase1.xml.JacksonXmlMigration
+displayName: eGovFrame 3.1 to 4.3 - Jackson XML Migration
+description: >
+  Conservative Spring XML replacement for Jackson 1.x converter class names.
+  This recipe only updates the well-known Spring MVC converter type name and
+  does not attempt broader message-converter or ObjectMapper bean rewrites.
+
+recipeList:
+  - org.openrewrite.text.FindAndReplace:
+      find: MappingJacksonHttpMessageConverter
+      replace: MappingJackson2HttpMessageConverter
+      filePattern: "**/*.xml"

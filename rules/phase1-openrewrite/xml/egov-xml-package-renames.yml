@@ -1,0 +1,14 @@
+type: specs.openrewrite.org/v1beta/recipe
+name: egov.migration.phase1.xml.EgovXmlPackageRenames
+displayName: eGovFrame 3.1 to 4.3 - XML eGov Package Renames
+description: >
+  Conservative XML text replacements for eGovFrame runtime package renames.
+  This recipe updates XML bean class names, type aliases, exception mappings,
+  and similar string-based references from egovframework.rte.* to
+  org.egovframe.rte.*.
+
+recipeList:
+  - org.openrewrite.text.FindAndReplace:
+      find: egovframework.rte
+      replace: org.egovframe.rte
+      filePattern: "**/*.xml"

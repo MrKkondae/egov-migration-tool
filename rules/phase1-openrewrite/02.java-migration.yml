@@ -27,6 +27,11 @@ recipeList:
   # - EgovAbstractDAO -> EgovAbstractMapper migration
   #   Review points:
   #   * iBatis / MyBatis coexistence must be identified first
+  #   * sample projects often use custom wrappers such as
+  #     egovframework.com.cmm.service.impl.EgovComAbstractDAO
+  #   * SqlMapClient injection / setSuperSqlMapClient wiring may exist
+  #   * list/select/insert/update/delete call sites may need method-level
+  #     refactoring or a project-local compatibility layer
   #   * DAO base class replacement may require code-level refactoring
   #
   # - Log4j 1.x Logger -> SLF4J Logger migration
