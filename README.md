@@ -1,14 +1,14 @@
 # eGov Migration Tool
 
-전자정부프레임워크 3.x → 4.3 전환 자동화를 위한 도구 및 전환 규칙 관리 프로젝트
+전자정부프레임워크 3.x에서 4.3으로 전환하기 위한 절차, 규칙, 자동화 도구를 관리하는 프로젝트다.
 
 ---
 
 # 목표
 
-본 프로젝트는 전자정부프레임워크 3.x 시스템을 4.3 환경으로 전환하기 위한 전환 절차, 전환 규칙, 자동화 도구 및 검증 체계를 구축하는 것을 목표로 한다.
+본 프로젝트의 목표는 전환 작업을 일회성 대응이 아니라 재사용 가능한 절차와 도구로 정리하는 것이다.
 
-최종적으로는 다음과 같은 전환 프로세스를 자동화한다.
+최종적으로는 아래 흐름을 기준으로 전환을 수행한다.
 
 ```text
 AS-IS 분석
@@ -30,418 +30,137 @@ Phase3 변환 (LLM 보정)
 
 ---
 
+# 문서 안내
+
+프로젝트 문서는 아래처럼 역할을 나눠 관리한다.
+
+* `README.md`
+  프로젝트 목표, 전체 전환 흐름, Phase 정의, 문서 구조 안내
+* `docs/migration-process.md`
+  Phase1/Phase2 중심의 상세 수행절차, 입력물/산출물, 검증 포인트
+* `tools/README.MD`
+  Python 도구 구조와 `run_phase2` 실행 방법
+
+전환 관련 프롬프트, 분석 도구, 변환 도구는 위 문서 구조를 기준으로 정리한다.
+
+---
+
 # 수행 주체
 
-| 단계        | OpenRewrite | Python | LLM | 전환담당자 |
-| --------- | ----------- | ------ | --- | ----- |
-| AS-IS 분석  | -           | 주관     | 보조  | 검토    |
-| TO-BE 조사  | -           | -      | 주관  | 검토    |
-| 전환규칙 수립   | -           | -      | 주관  | 승인    |
-| Phase1 변환 | 주관          | -      | -   | 검토    |
-| Phase2 변환 | 보조          | 주관     | -   | 검토    |
-| Phase3 변환 | -           | -      | 주관  | 승인    |
-| 컴파일 검증    | -           | 주관     | 보조  | 검토    |
-| 룰 보강      | -           | -      | 주관  | 승인    |
+| 단계 | OpenRewrite | Python | LLM | 전환담당자 |
+| --- | --- | --- | --- | --- |
+| AS-IS 분석 | - | 주관 | 보조 | 검토 |
+| TO-BE 조사 | - | - | 주관 | 검토 |
+| 전환 규칙 수립 | - | - | 주관 | 승인 |
+| Phase1 변환 | 주관 | - | - | 검토 |
+| Phase2 변환 | 보조 | 주관 | - | 검토 |
+| Phase3 변환 | - | - | 주관 | 승인 |
+| 컴파일 검증 | - | 주관 | 보조 | 검토 |
+| 규칙 보강 | - | - | 주관 | 승인 |
 
 ---
 
-## 전환 기준 문서
-
-전자정부프레임워크 전환 절차와 역할 기준은 아래 문서를 따른다.
-
-* `docs/migration-process.md`
-
-본 프로젝트의 모든 프롬프트, 분석 도구, 변환 도구는 해당 문서를 기준으로 작성한다.
-
----
-
-# 전환 절차
+# 전환 절차 개요
 
 ## 1. AS-IS 인벤토리 수집
 
-### 목적
+현재 시스템 구조와 기술 스택을 분석하여 전환 범위를 식별한다.
 
-현재 시스템의 구조 및 기술 스택을 분석하여 전환 범위를 식별한다.
+주요 내용:
 
-### 수행 주체
+* Maven 프로젝트, 모듈, Java, JSP, SQL Map, Spring XML 수집
+* `pom.xml` 및 라이브러리 분석
+* iBatis, MyBatis, Security, Scheduler, Validator 등 기술 스택 파악
 
-* Python 프로그램
-* 전환 담당자
-
-### 수행 내용
-
-#### 프로젝트 구조 분석
-
-* Maven 프로젝트 수
-* 모듈 수
-* Java Source 수
-* JSP 수
-* SQL Map 수
-* Spring XML 수
-
-#### Dependency 분석
-
-* pom.xml 분석
-* Library 분석
-* eGovFrame 버전 확인
-
-#### 기술 스택 분석
-
-* Spring MVC
-* iBatis
-* MyBatis
-* Security
-* Scheduler
-* Validator
-* Property Service
-* ID Generator
-
-### 산출물
+산출물:
 
 ```text
 output/inventory/
 ```
 
----
+## 2. TO-BE 후보 조사
 
-## 2. TO-BE 후보 조사 (RAG 기반)
+전자정부프레임워크 4.3 기준 변경사항과 전환 사례를 수집한다.
 
-### 목적
+주요 내용:
 
-전자정부프레임워크 4.3 기준 변경사항을 수집한다.
+* eGovFrame Wiki, Release Note, Migration Guide 조사
+* 샘플 프로젝트와 기존 전환 사례 검토
+* `EgovAbstractDAO -> EgovAbstractMapper`
+* `sqlMapClient -> SqlSessionFactory`
+* `iBatis -> MyBatis`
 
-### 수행 주체
-
-* LLM
-* 전환 담당자
-
-### 수행 내용
-
-#### 공식 자료 분석
-
-* eGovFrame Wiki
-* Release Note
-* Migration Guide
-
-#### 샘플 프로젝트 분석
-
-* eGovFrame 4.3 Sample
-
-#### 기존 전환 사례 분석
-
-* 사내 전환 프로젝트
-* 검증 완료된 전환 규칙
-
-#### 변경점 수집
-
-예)
-
-```text
-EgovAbstractDAO
-→ EgovAbstractMapper
-```
-
-```text
-sqlMapClient
-→ SqlSessionFactory
-```
-
-```text
-iBatis
-→ MyBatis
-```
-
-### 산출물
+산출물:
 
 ```text
 knowledge/
 ```
 
----
-
 ## 3. 전환 규칙 수립
 
-### 목적
+자동 변환 가능한 규칙을 정의하고 도구에 반영한다.
 
-자동 변환 가능한 규칙을 정의한다.
+주요 대상:
 
-### 수행 주체
+* pom.xml 규칙
+* DAO 규칙
+* SQL Map 규칙
+* Spring XML 규칙
+* Controller 규칙
 
-* LLM
-* 전환 담당자
-
-### 수행 내용
-
-#### pom.xml 규칙
-
-* Dependency 변경
-* Version 변경
-* Plugin 변경
-
-#### DAO 규칙
-
-* Class 변경
-* Import 변경
-* Method 변경
-
-#### SQL Map 규칙
-
-* XML Namespace 변경
-* Dynamic SQL 변경
-* Parameter 변경
-
-#### Spring XML 규칙
-
-* Bean 변경
-* DataSource 변경
-* Transaction 변경
-
-#### Controller 규칙
-
-* Annotation 변경
-* Import 변경
-
-### 산출물
+산출물:
 
 ```text
 rules/
-├── pom-rules.yaml
-├── dao-rules.yaml
-├── sqlmap-rules.yaml
-├── spring-rules.yaml
-└── controller-rules.yaml
+├── phase1-openrewrite/
+└── analysis/
 ```
 
 ---
 
 # 전환 Phase 정의
 
-전자정부프레임워크 전환은 모든 항목을 동일한 방식으로 처리할 수 없다.
+전자정부프레임워크 전환은 모든 항목을 같은 방식으로 처리할 수 없기 때문에, 변경 난이도와 자동화 가능 수준에 따라 Phase 단위로 나눈다.
 
-변경 난이도와 자동화 가능 수준에 따라 전환 대상을 Phase 단위로 분류한다.
+## Phase1: OpenRewrite 기반 구조 변환
 
----
+특징:
 
-## Phase 1 : OpenRewrite 기반 구조 변환
+* 전후 매핑이 명확하다
+* 의미 변경 없이 대량 치환이 가능하다
+* 저위험 의존성/패키지/타입 변경에 적합하다
 
-### 특징
+주요 대상:
 
-* 패턴이 명확함
-* 변경 전/후 매핑이 확정됨
-* 소스 의미 변경 없음
-* 대규모 자동 변환 가능
+* `egovframework.rte.* -> org.egovframe.rte.*`
+* Spring 3.x 계열 의존성 정리
+* Jackson 1.x -> 2.x 치환
+* `ojdbc14 -> ojdbc8`
+* logging 관련 저위험 치환
 
-### 수행 도구
-
-* OpenRewrite
-
-### 대상
-
-#### Maven Dependency
-
-```text
-egovframework.rte.*
-→
-org.egovframe.rte.*
-```
-
-#### Spring Dependency
-
-```text
-Spring 3.x
-→
-Spring 5.x / Boot 관리
-```
-
-#### Jackson
-
-```text
-org.codehaus.jackson.*
-→
-com.fasterxml.jackson.*
-```
-
-#### Oracle JDBC
-
-```text
-ojdbc14
-→
-ojdbc8
-```
-
-#### Logging
-
-```text
-commons-logging
-→
-slf4j
-```
-
-### 산출물
+대표 산출물:
 
 ```text
 converted/phase1/
+rules/phase1-openrewrite/
 ```
 
----
+## Phase2: Python 규칙 기반 소스 변환
 
-## Phase 2 : 규칙 기반 소스 변환
-
-### 특징
+특징:
 
 * 코드 구조 변경이 필요한 영역을 다룬다
-* OpenRewrite 단독으로는 부족하고 Python 변환 프로그램이 주도한다
-* OpenRewrite는 저위험 치환과 사전 정리 작업으로 병행한다
-* 변환 후 잔존 패턴 탐지와 검증 자동화가 함께 필요하다
+* OpenRewrite 단독으로 처리하기 어려운 변환을 Python이 주도한다
+* 변환 후 잔존 패턴 탐지와 수동 검토 분류가 중요하다
 
-### 수행 도구
+주요 대상:
 
-* Python
-* OpenRewrite 일부
+* DAO 상속 및 호출 패턴 변환
+* SQL Map에서 MyBatis XML로의 구조 변환
+* Spring XML의 `SqlMapClient` 연계 설정 정리
+* 후처리 경고와 수동 검토 대상 보고서 생성
 
-### 수행 방식
-
-Phase 2는 `Python Rule Engine` 단독 단계가 아니라, 아래와 같은 역할 분리로 수행한다.
-
-* Python
-  iBatis/MyBatis 판별, DAO/SQL Map/Spring XML 구조 변환, 잔존 패턴 스캔, 후처리 대상 분류
-* OpenRewrite
-  Java/XML의 저위험 package/type/name 치환, pom 선행 정리
-* 검증 스크립트
-  컴파일 로그, 잔존 구문, mapper/DAO 연결 불일치 탐지
-
-### 규칙 변환 대상
-
-#### 1. Python 주도 핵심 변환
-
-##### DAO
-
-```java
-extends EgovAbstractDAO
-```
-
-→
-
-```java
-extends EgovAbstractMapper
-```
-
-단, 실제로는 단순 상속 변경만이 아니라 아래를 함께 검토해야 한다.
-
-* `EgovComAbstractDAO` 같은 프로젝트 공통 DAO 래퍼 존재 여부
-* `list()`, `select()`, `insert()`, `update()`, `delete()` 호출 패턴
-* `SqlMapClient`, `SqlMapClientTemplate` 사용 여부
-
-##### SQL Map / MyBatis XML
-
-```xml
-#id#
-```
-
-→
-
-```xml
-#{id}
-```
-
-```xml
-<sqlMap>
-```
-
-→
-
-```xml
-<mapper>
-```
-
-이 영역은 아래와 같은 iBatis 문법 변환을 포함한다.
-
-* `#var#`, `$var$`
-* `<dynamic>`, `<isNotEmpty>`, `<isEqual>`, `<iterate>`
-* `parameterClass`, `resultClass`
-* namespace / statement id / resultMap 구조 정리
-
-##### Spring XML의 iBatis 연계 설정
-
-```xml
-org.springframework.orm.ibatis.SqlMapClientFactoryBean
-```
-
-→
-
-```xml
-org.mybatis.spring.SqlSessionFactoryBean
-```
-
-단, 이 항목은 bean class 이름 치환만으로 끝나지 않는다.
-
-* bean id 변경 여부
-* `configLocation` / `mapperLocations` 구조 변경
-* DAO / mapper XML / Spring bean 참조 관계 동시 정리
-
-#### 2. OpenRewrite 병행 대상
-
-Python 변환과 별도로, 아래 항목은 OpenRewrite를 함께 적용하는 것이 효율적이다.
-
-* `egovframework.rte.*` → `org.egovframe.rte.*` Java/XML 잔존분 정리
-* Jackson 1.x → 2.x Java/XML 치환
-* pom 의존성 좌표/버전 선행 정리
-
-주의:
-`egovframework.*` 전체를 일괄 `org.egovframe.*`로 바꾸는 것은 대상이 아니다.
-Phase 2에서 OpenRewrite가 다루는 것은 기본적으로 `egovframework.rte.*` 계열의 잔존분이다.
-
-#### 3. Python 후처리 / 검증 대상
-
-OpenRewrite 또는 Python 변환 직후, 아래 검증을 Python 프로그램으로 함께 수행해야 한다.
-
-* `EgovAbstractDAO`, `EgovComAbstractDAO` 잔존 여부 탐지
-* `SqlMapClientFactoryBean`, `SqlMapClientTemplate` 잔존 여부 탐지
-* `#...#`, `<dynamic>`, `<isNotEmpty>`, `<iterate>` 등 iBatis XML 잔존 패턴 탐지
-* DAO class / mapper namespace / statement id 연결 불일치 탐지
-* 변환 결과를 `자동 수정 가능`, `LLM 보정 필요`, `수동 검토 필요`로 분류
-
-### Phase 2 후보 중 후순위 항목
-
-아래 항목은 규칙 기반 변환 후보이지만, Phase 2 핵심 자동화 범위와는 분리해서 보는 것이 안전하다.
-
-#### Validation
-
-```java
-spring-modules-validation
-```
-
-→
-
-```java
-Bean Validation
-```
-
-이 항목은 Java만이 아니라 아래를 함께 다뤄야 한다.
-
-* `DefaultBeanValidator`
-* `validator-rules.xml`
-* `validation.xml`
-* VO annotation 전환
-
-따라서 `Phase 2 후보 + Phase 3/수동 보정 연계` 대상으로 관리한다.
-
-#### Quartz
-
-```text
-Quartz 1.x
-```
-
-→
-
-```text
-Quartz 2.x
-```
-
-Quartz는 API, job 설정, trigger 설정 차이 검토가 필요하므로 공통 규칙만으로 끝나지 않을 수 있다.
-따라서 `Phase 2 후보 + 개별 검토` 대상으로 둔다.
-
-### 산출물
+대표 산출물:
 
 ```text
 converted/phase2/
@@ -449,76 +168,27 @@ output/reports/
 output/logs/
 ```
 
-## Phase 3 : LLM 예외 보정
+실행 방법과 상세 절차는 아래 문서를 참고한다.
 
-### 특징
+* `docs/migration-process.md`
+* `tools/README.MD`
 
-* 프로젝트별 편차 존재
-* 정형화 어려움
-* 업무 코드 영향 가능
+## Phase3: LLM 예외 보정
 
-### 수행 도구
+특징:
 
-* LLM
-* 전환 담당자
+* 프로젝트별 편차가 큰 영역을 다룬다
+* 정형화가 어렵거나 업무 코드 영향이 큰 항목을 보정한다
 
-### 대상
+주요 대상:
 
-#### iBatis → MyBatis
+* 복잡한 Dynamic SQL
+* DAO API 의미 보정
+* 특수 Spring XML wiring
+* 솔루션 연계 설정
+* 컴파일 오류 후속 수정
 
-```xml
-<dynamic>
-<isNotEmpty>
-<iterate>
-```
-
-↓
-
-```xml
-<if>
-<foreach>
-<choose>
-```
-
-#### 복잡한 DAO
-
-```java
-queryForList()
-queryForObject()
-```
-
-↓
-
-```java
-selectList()
-selectOne()
-```
-
-#### Spring XML 특수 설정
-
-```xml
-Bean Wiring
-Custom FactoryBean
-```
-
-#### 솔루션 연계
-
-```text
-OZ
-Petra
-Xecure
-JCAOS
-```
-
-#### 컴파일 오류 보정
-
-```text
-Import 오류
-Mapper 오류
-API 변경 오류
-```
-
-### 산출물
+대표 산출물:
 
 ```text
 output/reports/
@@ -526,252 +196,55 @@ output/reports/
 
 ---
 
-## 4. 자동 변환
+# 자동 변환과 검증
 
-### 목적
+## 자동 변환
 
-전환 규칙을 이용하여 자동 변환을 수행한다.
+전환 규칙을 이용해 Phase1과 Phase2 변환을 수행한다.
 
-### 수행 주체
+* Phase1: Dependency, Maven 구조, import 정리
+* Phase2: DAO, SQL Map, Spring XML 변환
 
-* OpenRewrite
-* Python 프로그램
-
-### 수행 내용
-
-#### Phase1
-
-* Dependency 변경
-* Maven 구조 정리
-* Import 변경
-
-#### Phase2
-
-* DAO 변환
-* SQL Map 변환
-* Spring XML 변환
-
-### 산출물
+산출물:
 
 ```text
 converted/
 ```
 
----
-
-## 5. LLM 예외 보정
-
-### 목적
-
-규칙 기반 변환으로 처리하기 어려운 부분을 보완한다.
-
-### 수행 주체
-
-* LLM
-* 전환 담당자
-
-### 수행 내용
-
-#### DAO 보정
-
-```java
-list()
-→
-selectList()
-```
-
-#### SQL Map 보정
-
-```xml
-#id#
-→
-#{id}
-```
-
-#### Dynamic SQL 보정
-
-```xml
-<isNotEmpty>
-→
-<if test="">
-```
-
-#### Spring XML 보정
-
-* Bean Wiring 검토
-* 복잡한 설정 검토
-
-### 산출물
-
-```text
-output/reports/
-```
-
----
-
-## 6. 컴파일 검증
-
-### 목적
+## 컴파일 검증
 
 전환 결과의 정상 동작 여부를 검증한다.
 
-### 수행 주체
+주요 내용:
 
-* Python 프로그램
-* 전환 담당자
+* `mvn clean compile`
+* import 오류, dependency 오류, API 변경 오류, mapper 오류 분석
+* `자동 수정 가능`, `규칙 추가 필요`, `수동 검토 필요`로 분류
 
-### 수행 내용
-
-#### Build 수행
-
-```bash
-mvn clean compile
-```
-
-#### 오류 분석
-
-* Import 오류
-* Dependency 오류
-* API 변경 오류
-* Mapper 오류
-
-#### 오류 분류
-
-##### 자동 수정 가능
-
-* Import 누락
-* Package 변경
-
-##### 규칙 추가 필요
-
-* API 변경
-* Framework 변경
-
-##### 수동 검토 필요
-
-* 업무 로직
-* SQL 로직
-
-### 산출물
+산출물:
 
 ```text
 output/logs/
 output/reports/
 ```
 
----
-
-## 7. 전환 규칙 보강
-
-### 목적
+## 전환 규칙 보강
 
 검증 과정에서 발견된 오류를 규칙에 반영하여 재사용성을 높인다.
 
-### 수행 주체
+예:
 
-* LLM
-* 전환 담당자
-
-### 수행 내용
-
-#### 오류 패턴 분석
-
-예)
-
-```java
+```text
 import egovframework.rte.psl.dataaccess.EgovAbstractMapper;
-```
-
-↓
-
-```java
+→
 import org.egovframe.rte.psl.dataaccess.EgovAbstractMapper;
 ```
 
-#### 규칙 추가
-
-```yaml
-rule-id: DAO-001
-phase: PHASE2
-tool: python
-
-dao-import:
-  before:
-    - egovframework.rte.psl.dataaccess.EgovAbstractMapper
-  after:
-    - org.egovframe.rte.psl.dataaccess.EgovAbstractMapper
-```
-
-#### 규칙 저장
-
-* DAO 규칙
-* SQL Map 규칙
-* Spring 규칙
-* pom.xml 규칙
-
-### 산출물
-
-```text
-rules/
-```
-
 ---
 
-# 디렉토리 구조
+# 상세 문서
 
-```text
-egov-migration-tool/
-├── rules/
-│   ├── phase1-openrewrite/
-│   ├── phase2-python/
-│   └── phase3-llm/
-├── tools/
-│   ├── inventory/
-│   ├── analysis/
-│   └── conversion/
-├── prompts/
-├── knowledge/
-├── samples/
-│   ├── asis/
-│   └── expected/
-├── output/
-│   ├── inventory/
-│   ├── reports/
-│   └── logs/
-├── converted/
-│   ├── phase1/
-│   ├── phase2/
-│   └── phase3/
-└── README.md
-```
-
-## 디렉토리 설명
-
-* rules/phase1-openrewrite = OpenRewrite 규칙
-* rules/phase2-python = Python 변환 규칙
-* rules/phase3-llm = LLM 보정 규칙
-* tools/inventory = AS-IS 인벤토리 분석
-* tools/analysis = 패턴 분석
-* tools/conversion = 변환 프로그램
-* prompts = Codex/LLM 프롬프트
-* knowledge = RAG 및 조사 결과
-* samples/asis = 원본 소스
-* samples/expected = 기대 결과 샘플
-* output/inventory = 인벤토리 분석 결과
-* output/reports = 검토 보고서
-* output/logs = 실행 로그
-* converted/phase1 = OpenRewrite 결과
-* converted/phase2 = Python 변환 결과
-* converted/final = 최종 결과
-
----
-
-# 최종 목표
-
-* 전환 규칙 자산화
-* 반복 가능한 전환 프로세스 구축
-* OpenRewrite + Python + LLM 역할 분리
-* LLM 의존도 최소화
-* Python 기반 자동 변환율 향상
-* 프로젝트별 전환 품질 표준화
-* 전자정부프레임워크 전환 방법론 정립
+* [전환 수행절차](./docs/migration-process.md)
+* [도구 사용 안내](./tools/README.MD)
+* [전환 아키텍처](./tools/CONVERSION_ARCHITECTURE.md)
+* [sqlMapClient 분석기 문서](./tools/SQLMAPCLIENT_USAGE_ANALYZER.md)
