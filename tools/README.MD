@@ -1,15 +1,19 @@
 # Tools Guide
 
-`tools/` 디렉터리는 전자정부프레임워크 3.x -> 4.3 전환을 위한 Python 도구를 모아두는 영역이다.
+`tools/` 디렉터리는 전자정부프레임워크 3.x -> 4.3 전환을 위한 Python 도구 모음이다.
 
-이 도구들은 현재 기준으로 별도 `pip` 설치 없이 표준 라이브러리만으로 실행할 수 있다.
+이 문서는 도구 구조와 Phase2 실행 방법에 초점을 맞춘다. 전체 전환 절차는 상위 문서인 `README.md`와 `docs/migration-process.md`를 참고한다.
 
-핵심 원칙은 아래와 같다.
+---
 
-* `inventory/`는 프로젝트를 읽어서 전체 현황을 수집한다.
-* `analysis/`는 특정 전환 주제에 대해 위험 요소와 후보를 분석한다.
-* `conversion/`은 실제 규칙 기반 변환을 수행한다.
-* 사람이 읽는 산출물은 Markdown으로, 프로그램 간 전달 데이터는 JSON으로 관리한다.
+## 관련 문서
+
+* `../README.md`
+* `../docs/migration-process.md`
+* `CONVERSION_ARCHITECTURE.md`
+* `SQLMAPCLIENT_USAGE_ANALYZER.md`
+
+---
 
 ## 디렉터리 구조
 
@@ -21,7 +25,9 @@ tools/
 │   └── collect_inventory.py
 ├── analysis/
 │   ├── analyze_dao.py
+│   ├── analyze_sqlmapclient_usage.py
 │   ├── classify_dao_targets.py
+│   ├── classify_sqlmapclient_targets.py
 │   └── generate_dao_rag_questions.py
 ├── conversion/
 │   ├── __init__.py
@@ -39,24 +45,20 @@ tools/
     └── phase2-report.schema.json
 ```
 
+---
+
 ## 역할 분리
 
 ### inventory
 
-`tools/inventory/collect_inventory.py`는 Java/Maven 기반 전자정부프레임워크 프로젝트를 읽기 전용으로 분석하여 AS-IS 인벤토리 Markdown을 생성한다.
+`tools/inventory/collect_inventory.py`는 Java/Maven 기반 프로젝트를 읽기 전용으로 분석하여 AS-IS 인벤토리를 생성한다.
 
 주요 기능:
 
 * 프로젝트 기본 정보 수집
 * `pom.xml` 기반 Maven 정보 수집
 * Java 소스 통계 및 위험 패턴 수집
-* Spring XML / SQL Map / `web.xml` / JSP / `.properties` 수집
-* 전환 우선순위 후보 생성
-
-현재 권장 방향:
-
-* 기존 Markdown 출력 유지
-* 향후 JSON 출력도 병행 추가
+* Spring XML / SQL Map / JSP / properties 파일 현황 수집
 
 ### analysis
 
@@ -65,26 +67,19 @@ tools/
 현재 포함 도구:
 
 * `analyze_dao.py`
-  DAO 후보, import, 상속, API 호출, 위험 요소 분석
+  DAO 후보, 상속, 호출 패턴, 위험 요소 분석
 * `analyze_sqlmapclient_usage.py`
-  `sqlMapClient` Java/XML 사용처 전수 수집 및 분류
+  `sqlMapClient` Java/XML 사용처 전수 수집
 * `classify_sqlmapclient_targets.py`
-  `sqlMapClient` 분석 JSON을 자동/조건부/수동 검토 대상으로 후속 분류
+  `sqlMapClient` 사용처를 자동/조건부/수동 검토 대상으로 분류
 * `classify_dao_targets.py`
   DAO 분석 결과를 바탕으로 전환 후보 분류
 * `generate_dao_rag_questions.py`
   RAG/LLM 확인용 질문 생성
 
-현재 권장 방향:
-
-* Markdown 보고서는 유지
-* 다음 단계부터는 JSON도 함께 출력
-* 다음 프로그램 입력은 Markdown보다 JSON 우선
-* 폐쇄망 프로젝트 분석용으로 Java/XML 사용처 전수 수집기를 함께 운영
-
 ### conversion
 
-`tools/conversion/`은 Phase 2 규칙 기반 변환 프로그램 영역이다.
+`tools/conversion/`은 Phase2 규칙 기반 변환을 수행하는 프로그램 영역이다.
 
 기본 파이프라인:
 
@@ -95,11 +90,13 @@ tools/
 3. `transform_*`
    DAO / SQL Map / Spring XML 변환
 4. `postcheck`
-   잔존 패턴, 실패 후보, 수동 검토 대상을 탐지
+   잔존 패턴과 수동 검토 대상을 탐지
 5. `report`
    JSON + Markdown 리포트 생성
 6. `run_phase2`
    전체 오케스트레이션
+
+---
 
 ## JSON 우선 원칙
 
@@ -109,7 +106,7 @@ tools/
 
 * Markdown 파싱은 헤더나 표 형식 변경에 취약하다
 * JSON은 다음 프로그램 입력으로 안정적이다
-* Markdown은 사람 검토용, JSON은 기계 처리용으로 역할 분리가 가능하다
+* Markdown은 사람 검토용, JSON은 기계 처리용으로 역할 분리가 쉽다
 
 기본 산출물 예시:
 
@@ -122,34 +119,99 @@ output/reports/
 └── phase2-report.md
 ```
 
-## 권장 개발 순서
+---
 
-1. `inventory` / `analysis` 스크립트에 JSON 출력 추가
-2. `conversion/discover.py`와 `conversion/classify.py` 완성
-3. `conversion/transform_sqlmap.py`에 MVP 규칙 구현
-4. `conversion/transform_dao.py`에 DAO 구조 변환 규칙 추가
-5. `conversion/postcheck.py`로 잔존 패턴 검증 자동화
+## Phase2 실행 절차
 
-## 실행 예시
+### 1. 사전 준비
 
-### inventory
+필수 입력:
 
-```bash
-python tools/inventory/collect_inventory.py ^
-  --source-root samples/asis/hello-egov-board ^
-  --output output/inventory/as-is-inventory.md
-```
+* `--source-root`
+  원본 프로젝트 루트
+* `--working-root`
+  변환 작업 디렉터리
+* `--report-root`
+  리포트 출력 디렉터리
 
-### conversion skeleton
+선택 입력:
+
+* `--dao-analysis-json`
+  `tools.analysis.analyze_dao` 결과 JSON
+* `--sqlmapclient-targets-json`
+  `tools.analysis.classify_sqlmapclient_targets` 결과 JSON
+* `--db-type`
+  `mapperLocations` 확장이 필요한 경우 DB 타입
+* `--copy-source`
+  원본을 작업 디렉터리로 복사한 뒤 변환 수행
+
+### 2. 기본 실행
 
 ```bash
 python -m tools.conversion.run_phase2 ^
   --source-root samples/asis/hello-egov-board ^
   --working-root converted/phase2/hello-egov-board ^
-  --report-root output/reports
+  --report-root output/reports/hello-egov-board ^
+  --copy-source
 ```
 
-## 관련 문서
+### 3. 분석 결과를 연결한 실행
 
-* [CONVERSION_ARCHITECTURE.md](./CONVERSION_ARCHITECTURE.md)
-* [SQLMAPCLIENT_USAGE_ANALYZER.md](./SQLMAPCLIENT_USAGE_ANALYZER.md)
+```bash
+python -m tools.conversion.run_phase2 ^
+  --source-root samples/asis/hello-egov-board ^
+  --working-root converted/phase2/hello-egov-board ^
+  --report-root output/reports/hello-egov-board ^
+  --dao-analysis-json output/reports/dao-pattern-analysis.json ^
+  --sqlmapclient-targets-json output/reports/sqlmapclient-usage-targets.json ^
+  --copy-source
+```
+
+### 4. 내부 처리 순서
+
+`run_phase2.py`는 내부적으로 아래 순서로 동작한다.
+
+1. 작업 디렉터리 준비
+2. 프로젝트 탐지와 분류
+3. 선택 분석 JSON 병합
+4. SQL Map 변환
+5. DAO 변환
+6. Spring XML 변환
+7. 후처리 경고 수집
+8. JSON/Markdown 보고서 생성
+
+### 5. 주요 출력물
+
+```text
+output/reports/<run-name>/
+├── phase2-discovery.json
+├── phase2-report.json
+└── phase2-report.md
+```
+
+`phase2-report.md`에서 특히 확인할 항목:
+
+* 변경 파일 수
+* 경고 유형 요약
+* 수동 검토 필요 파일
+* 잔존 iBatis / Spring 연계 패턴
+
+---
+
+## 권장 운영 방식
+
+1. `inventory`로 AS-IS 범위를 먼저 수집한다.
+2. `analysis`로 DAO와 `sqlMapClient` 위험 영역을 분류한다.
+3. `run_phase2`로 규칙 기반 변환을 수행한다.
+4. `phase2-report.md`를 보고 수동 검토 대상을 정리한다.
+5. 반복되는 예외는 규칙으로 환류한다.
+
+---
+
+## 권장 개발 순서
+
+1. `inventory` / `analysis` 스크립트의 JSON 출력을 확장한다.
+2. `conversion/discover.py`와 `conversion/classify.py`를 보강한다.
+3. `conversion/transform_sqlmap.py`의 규칙 커버리지를 확대한다.
+4. `conversion/transform_dao.py`의 DAO 구조 변환 규칙을 보강한다.
+5. `conversion/postcheck.py`의 잔존 패턴 검증을 강화한다.
