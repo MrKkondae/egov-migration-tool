@@ -38,13 +38,13 @@
 
                     <!-- Recipe 위치 -->
                     <configLocation>
-                        ${project.basedir}\rules\phase1-openrewrite\rewrite.yml
+                        ${project.basedir}/rules/phase1-openrewrite/rewrite.yml
                     </configLocation>
 
                     <!-- 활성 Recipe -->
                     <activeRecipes>
 
-                        <recipe>egov.poc.Egov31To43Phase1</recipe>
+                        <recipe>egov.migration.phase1.FullMigration</recipe>
 
                     </activeRecipes>
 

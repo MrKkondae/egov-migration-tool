@@ -1,71 +1,357 @@
-  # openRewrite yml 샘플
 type: specs.openrewrite.org/v1beta/recipe
-name: egov.poc.Egov31To43Phase1
-displayName: eGovFrame 3.1 to 4.3 Phase1
+name: egov.migration.phase1.FullMigration
+displayName: eGovFrame 3.1 to 4.3 - Phase 1 Full Migration
 description: >
-  Replace confirmed eGovFrame 3.1 dependency and Java import mappings
-  for eGovFrame 4.3 migration PoC.
+  Entry-point recipe for phase 1 migration. This file is self-contained so
+  rewrite-maven-plugin can load one config file and still resolve all
+  composite and leaf recipes required for pom.xml, Java, and XML changes.
 
 recipeList:
-  # eGov dependency mapping
+  - egov.migration.phase1.PomDependencyMigration
+  - egov.migration.phase1.JavaMigration
+  - egov.migration.phase1.XmlMigration
+
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: egov.migration.phase1.PomDependencyMigration
+displayName: eGovFrame 3.1 to 4.3 - Pom Dependency Migration
+description: >
+  Composite Maven dependency migration recipe for eGovFrame 3.1 to 4.3.
+
+recipeList:
+  - egov.migration.phase1.pom.EgovframeCoordinates
+  - egov.migration.phase1.pom.SpringUpgrades
+  - egov.migration.phase1.pom.LoggingUpgrades
+  - egov.migration.phase1.pom.JacksonJdbcJstl
+  - egov.migration.phase1.pom.SafeCommonVersionUpgrades
+
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: egov.migration.phase1.JavaMigration
+displayName: eGovFrame 3.1 to 4.3 - Java Migration
+description: >
+  Composite Java source migration recipe for eGovFrame 3.1 to 4.3.
+
+recipeList:
+  - egov.migration.phase1.java.EgovPackageRenames
+  - egov.migration.phase1.java.JacksonTypeMigration
+
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: egov.migration.phase1.XmlMigration
+displayName: eGovFrame 3.1 to 4.3 - XML Migration
+description: >
+  Composite XML migration recipe for eGovFrame 3.1 to 4.3.
+
+recipeList:
+  - egov.migration.phase1.xml.EgovXmlPackageRenames
+  - egov.migration.phase1.xml.JacksonXmlMigration
+
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: egov.migration.phase1.pom.EgovframeCoordinates
+displayName: eGovFrame 3.1 to 4.3 - eGovFrame Coordinates
+description: >
+  High-confidence 1:1 Maven coordinate migration for eGovFrame RTE
+  dependencies from eGovFrame 3.1 to 4.3.
+
+recipeList:
   - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
       oldGroupId: egovframework.rte
       oldArtifactId: egovframework.rte.fdl.cmmn
       newGroupId: org.egovframe.rte
       newArtifactId: org.egovframe.rte.fdl.cmmn
-      newVersion: 4.3.0
+      newVersion: "4.3.0"
+      changeManagedDependency: true
 
   - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
       oldGroupId: egovframework.rte
       oldArtifactId: egovframework.rte.fdl.idgnr
       newGroupId: org.egovframe.rte
       newArtifactId: org.egovframe.rte.fdl.idgnr
-      newVersion: 4.3.0
+      newVersion: "4.3.0"
+      changeManagedDependency: true
 
   - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
       oldGroupId: egovframework.rte
       oldArtifactId: egovframework.rte.fdl.logging
       newGroupId: org.egovframe.rte
       newArtifactId: org.egovframe.rte.fdl.logging
-      newVersion: 4.3.0
+      newVersion: "4.3.0"
+      changeManagedDependency: true
 
   - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
       oldGroupId: egovframework.rte
       oldArtifactId: egovframework.rte.fdl.property
       newGroupId: org.egovframe.rte
       newArtifactId: org.egovframe.rte.fdl.property
-      newVersion: 4.3.0
+      newVersion: "4.3.0"
+      changeManagedDependency: true
 
   - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
       oldGroupId: egovframework.rte
       oldArtifactId: egovframework.rte.psl.dataaccess
       newGroupId: org.egovframe.rte
       newArtifactId: org.egovframe.rte.psl.dataaccess
-      newVersion: 4.3.0
+      newVersion: "4.3.0"
+      changeManagedDependency: true
 
   - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
       oldGroupId: egovframework.rte
       oldArtifactId: egovframework.rte.ptl.mvc
       newGroupId: org.egovframe.rte
       newArtifactId: org.egovframe.rte.ptl.mvc
-      newVersion: 4.3.0
+      newVersion: "4.3.0"
+      changeManagedDependency: true
 
-  # Jackson 1.x to 2.x dependency mapping
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: egov.migration.phase1.pom.SpringUpgrades
+displayName: eGovFrame 3.1 to 4.3 - Spring Upgrades
+description: >
+  Conservative Spring Framework dependency upgrades for Spring 5.3.37.
+  Versions are upgraded only for dependencies already present in pom.xml.
+
+recipeList:
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.springframework
+      artifactId: spring-aop
+      newVersion: "5.3.37"
+      overrideManagedVersion: false
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.springframework
+      artifactId: spring-beans
+      newVersion: "5.3.37"
+      overrideManagedVersion: false
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.springframework
+      artifactId: spring-context
+      newVersion: "5.3.37"
+      overrideManagedVersion: false
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.springframework
+      artifactId: spring-context-support
+      newVersion: "5.3.37"
+      overrideManagedVersion: false
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.springframework
+      artifactId: spring-core
+      newVersion: "5.3.37"
+      overrideManagedVersion: false
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.springframework
+      artifactId: spring-expression
+      newVersion: "5.3.37"
+      overrideManagedVersion: false
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.springframework
+      artifactId: spring-jdbc
+      newVersion: "5.3.37"
+      overrideManagedVersion: false
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.springframework
+      artifactId: spring-orm
+      newVersion: "5.3.37"
+      overrideManagedVersion: false
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.springframework
+      artifactId: spring-tx
+      newVersion: "5.3.37"
+      overrideManagedVersion: false
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.springframework
+      artifactId: spring-web
+      newVersion: "5.3.37"
+      overrideManagedVersion: false
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.springframework
+      artifactId: spring-webmvc
+      newVersion: "5.3.37"
+      overrideManagedVersion: false
+
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: egov.migration.phase1.pom.LoggingUpgrades
+displayName: eGovFrame 3.1 to 4.3 - Logging Upgrades
+description: >
+  Conservative logging dependency upgrades for SLF4J and Log4j2 alignment.
+
+recipeList:
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.slf4j
+      artifactId: slf4j-api
+      newVersion: "1.7.36"
+      overrideManagedVersion: false
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.slf4j
+      artifactId: jcl-over-slf4j
+      newVersion: "1.7.36"
+      overrideManagedVersion: false
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.slf4j
+      artifactId: log4j-over-slf4j
+      newVersion: "1.7.36"
+      overrideManagedVersion: false
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.apache.logging.log4j
+      artifactId: log4j-api
+      newVersion: "2.17.1"
+      overrideManagedVersion: false
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.apache.logging.log4j
+      artifactId: log4j-core
+      newVersion: "2.17.1"
+      overrideManagedVersion: false
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.apache.logging.log4j
+      artifactId: log4j-slf4j-impl
+      newVersion: "2.17.1"
+      overrideManagedVersion: false
+
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: egov.migration.phase1.pom.JacksonJdbcJstl
+displayName: eGovFrame 3.1 to 4.3 - Jackson, MyBatis, JDBC, JSTL
+description: >
+  Pom-level dependency changes that are conservative enough for phase 1.
+
+recipeList:
   - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
       oldGroupId: org.codehaus.jackson
       oldArtifactId: jackson-core-asl
       newGroupId: com.fasterxml.jackson.core
       newArtifactId: jackson-core
-      newVersion: 2.17.2
+      newVersion: "2.15.4"
+      changeManagedDependency: true
 
   - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
       oldGroupId: org.codehaus.jackson
       oldArtifactId: jackson-mapper-asl
       newGroupId: com.fasterxml.jackson.core
       newArtifactId: jackson-databind
-      newVersion: 2.17.2
+      newVersion: "2.15.4"
+      changeManagedDependency: true
 
-  # Jackson imports
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.mybatis
+      artifactId: mybatis
+      newVersion: "3.5.16"
+      overrideManagedVersion: false
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.mybatis
+      artifactId: mybatis-spring
+      newVersion: "2.1.2"
+      overrideManagedVersion: false
+
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: com.oracle
+      oldArtifactId: ojdbc14
+      newGroupId: com.oracle.database.jdbc
+      newArtifactId: ojdbc8
+      newVersion: "19.22.0.0"
+      changeManagedDependency: true
+
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: com.oracle.database.jdbc
+      oldArtifactId: ojdbc14
+      newGroupId: com.oracle.database.jdbc
+      newArtifactId: ojdbc8
+      newVersion: "19.22.0.0"
+      changeManagedDependency: true
+
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: taglibs
+      oldArtifactId: standard
+      newGroupId: org.apache.taglibs
+      newArtifactId: taglibs-standard-impl
+      newVersion: "1.2.5"
+      changeManagedDependency: true
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: javax.servlet
+      artifactId: jstl
+      newVersion: "1.2"
+      overrideManagedVersion: false
+
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: egov.migration.phase1.pom.SafeCommonVersionUpgrades
+displayName: eGovFrame 3.1 to 4.3 - Safe Common Version Upgrades
+description: >
+  Conservative version upgrades for common utility libraries.
+
+recipeList:
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: commons-beanutils
+      artifactId: commons-beanutils
+      newVersion: "1.9.4"
+      overrideManagedVersion: false
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: commons-io
+      artifactId: commons-io
+      newVersion: "2.15.1"
+      overrideManagedVersion: false
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.apache.commons
+      artifactId: commons-lang3
+      newVersion: "3.12.0"
+      overrideManagedVersion: false
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: commons-net
+      artifactId: commons-net
+      newVersion: "3.9.0"
+      overrideManagedVersion: false
+
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: egov.migration.phase1.java.EgovPackageRenames
+displayName: eGovFrame 3.1 to 4.3 - eGov Package Renames
+description: >
+  Conservative Java package renames for eGovFrame runtime classes.
+
+recipeList:
+  - org.openrewrite.java.ChangePackage:
+      oldPackageName: egovframework.rte
+      newPackageName: org.egovframe.rte
+      recursive: true
+
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: egov.migration.phase1.java.JacksonTypeMigration
+displayName: eGovFrame 3.1 to 4.3 - Jackson Type Migration
+description: >
+  Conservative Jackson 1.x to 2.x Java source migration.
+
+recipeList:
+  - org.openrewrite.java.ChangePackage:
+      oldPackageName: org.codehaus.jackson.annotate
+      newPackageName: com.fasterxml.jackson.annotation
+      recursive: true
+
+  - org.openrewrite.java.ChangePackage:
+      oldPackageName: org.codehaus.jackson.map.annotate
+      newPackageName: com.fasterxml.jackson.databind.annotation
+      recursive: true
+
   - org.openrewrite.java.ChangeType:
       oldFullyQualifiedTypeName: org.codehaus.jackson.map.ObjectMapper
       newFullyQualifiedTypeName: com.fasterxml.jackson.databind.ObjectMapper
@@ -75,9 +361,55 @@ recipeList:
       newFullyQualifiedTypeName: com.fasterxml.jackson.databind.JsonNode
 
   - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: org.codehaus.jackson.JsonFactory
+      newFullyQualifiedTypeName: com.fasterxml.jackson.core.JsonFactory
+
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: org.codehaus.jackson.JsonParser
+      newFullyQualifiedTypeName: com.fasterxml.jackson.core.JsonParser
+
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: org.codehaus.jackson.JsonGenerator
+      newFullyQualifiedTypeName: com.fasterxml.jackson.core.JsonGenerator
+
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: org.codehaus.jackson.JsonToken
+      newFullyQualifiedTypeName: com.fasterxml.jackson.core.JsonToken
+
+  - org.openrewrite.java.ChangeType:
       oldFullyQualifiedTypeName: org.codehaus.jackson.type.TypeReference
       newFullyQualifiedTypeName: com.fasterxml.jackson.core.type.TypeReference
 
   - org.openrewrite.java.ChangeType:
       oldFullyQualifiedTypeName: org.codehaus.jackson.annotate.JsonIgnoreProperties
       newFullyQualifiedTypeName: com.fasterxml.jackson.annotation.JsonIgnoreProperties
+
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: org.springframework.http.converter.json.MappingJacksonHttpMessageConverter
+      newFullyQualifiedTypeName: org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
+
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: egov.migration.phase1.xml.EgovXmlPackageRenames
+displayName: eGovFrame 3.1 to 4.3 - XML eGov Package Renames
+description: >
+  Conservative XML text replacements for eGovFrame runtime package renames.
+
+recipeList:
+  - org.openrewrite.text.FindAndReplace:
+      find: egovframework.rte
+      replace: org.egovframe.rte
+      filePattern: "**/*.xml"
+
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: egov.migration.phase1.xml.JacksonXmlMigration
+displayName: eGovFrame 3.1 to 4.3 - Jackson XML Migration
+description: >
+  Conservative Spring XML replacement for Jackson 1.x converter class names.
+
+recipeList:
+  - org.openrewrite.text.FindAndReplace:
+      find: MappingJacksonHttpMessageConverter
+      replace: MappingJackson2HttpMessageConverter
+      filePattern: "**/*.xml"
