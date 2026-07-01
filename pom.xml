@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.egov.migration</groupId>
+    <artifactId>egov-openrewrite</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+
+    <properties>
+
+        <!-- Java -->
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+
+        <!-- OpenRewrite -->
+        <rewrite.version>6.11.0</rewrite.version>
+
+    </properties>
+
+    <build>
+
+        <plugins>
+
+            <plugin>
+
+                <groupId>org.openrewrite.maven</groupId>
+
+                <artifactId>rewrite-maven-plugin</artifactId>
+
+                <version>${rewrite.version}</version>
+
+                <configuration>
+
+                    <!-- Recipe 위치 -->
+                    <configLocation>
+                        ${project.basedir}\rules\phase1-openrewrite\rewrite.yml
+                    </configLocation>
+
+                    <!-- 활성 Recipe -->
+                    <activeRecipes>
+
+                        <recipe>egov.poc.Egov31To43Phase1</recipe>
+
+                    </activeRecipes>
+
+                    <!-- 실패해도 계속 진행 -->
+                    <failOnInvalidActiveRecipes>false</failOnInvalidActiveRecipes>
+
+                    <failOnDryRunResults>false</failOnDryRunResults>
+
+                    <exportDatatables>true</exportDatatables>
+
+                </configuration>
+
+            </plugin>
+
+        </plugins>
+
+    </build>
+
+</project>
