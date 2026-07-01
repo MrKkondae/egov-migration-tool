@@ -54,3 +54,12 @@ recipeList:
       newArtifactId: org.egovframe.rte.ptl.mvc
       newVersion: "4.3.0"
       changeManagedDependency: true
+
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: egovframework.rte
+      oldArtifactId: egovframework.rte.fdl.excel
+      newGroupId: org.egovframe.rte
+      newArtifactId: org.egovframe.rte.fdl.excel
+      newVersion: 4.3.0
+      changeManagedDependency: true
+
