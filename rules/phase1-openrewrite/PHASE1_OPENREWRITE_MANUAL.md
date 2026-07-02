@@ -1,4 +1,4 @@
-# Phase1 OpenRewrite Manual
+﻿# Phase1 OpenRewrite Manual
 
 ## 1. 목적
 
@@ -253,6 +253,50 @@ Copy-Item `
   samples/asis/hello-egov-board/target/rewrite/rewrite.patch `
   output/rewrite-patches/hello-egov-board-full-dryrun-20260702-01.patch
 ```
+
+통합 dry run 확인 포인트:
+
+* `pom.xml`, `src/main/java`, `src/main/resources`, `src/main/webapp` 변경이 의도한 범위인지 확인
+* 개별 POM / Java / XML 단계에서 이미 반영한 변경이 다시 과도하게 반복되지 않는지 확인
+* 예상하지 않은 신규 파일 생성, 삭제, package rename 이 없는지 확인
+
+통합 run 이 필요한 경우:
+
+```powershell
+mvn -f samples/asis/hello-egov-board/pom.xml org.openrewrite.maven:rewrite-maven-plugin:6.11.0:runNoFork -Drewrite.configLocation=../../../rules/phase1-openrewrite/rewrite.yml -Drewrite.activeRecipes=egov.migration.phase1.FullMigration
+```
+
+통합 run patch 백업 예시:
+
+```powershell
+Copy-Item `
+  samples/asis/hello-egov-board/target/rewrite/rewrite.patch `
+  output/rewrite-patches/hello-egov-board-full-run-20260702-01.patch
+```
+
+통합 run 후 권장 검증:
+
+```powershell
+mvn -f samples/asis/hello-egov-board/pom.xml validate
+```
+
+가능하면 추가 확인:
+
+```powershell
+mvn -f samples/asis/hello-egov-board/pom.xml compile
+```
+
+```powershell
+mvn -f samples/asis/hello-egov-board/pom.xml dependency:tree
+```
+
+통합 검증 판단 기준:
+
+* `FullMigration dryRunNoFork` 결과가 없거나, 있어도 이미 검토한 범위의 미세 조정 수준인지 확인
+* `runNoFork` 이후 `validate` 가 성공하는지 확인
+* 가능하면 `compile` 까지 성공하는지 확인
+* 의존성 해석 결과가 POM 단계에서 의도한 `org.egovframe.rte` 좌표로 유지되는지 확인
+* 최종 patch 는 `output/rewrite-patches/` 에 별도 보관하고 Phase1 종료 산출물로 남긴다
 
 ## 6. 이번 검증에서 실제 반영된 변경
 
