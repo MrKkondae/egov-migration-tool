@@ -29,19 +29,58 @@ Maven
 
 ## 3. 사전 준비
 
-### 3.1 Docker
+# 3. 사전 준비
 
-로컬 Nexus는 Docker Container로 실행한다.
+## 3.1 Docker Desktop 설치
 
-확인 명령:
+로컬 Nexus Repository는 Docker Container로 실행한다.
+
+### 다운로드
+
+- Docker Desktop for Windows 설치
+- WSL2 기반 설치(권장)
+
+### 설치 확인
 
 ```cmd
 docker version
 ```
 
+예시
+
+```text
+Client:
+ Version: 28.x.x
+
+Server:
+ Engine:
+  Version: 28.x.x
+```
+
+또는
+
+```cmd
+docker --version
+```
+
+### Docker 실행 확인
+
 ```cmd
 docker ps
 ```
+
+실행 결과
+
+```text
+CONTAINER ID   IMAGE   COMMAND   STATUS   PORTS   NAMES
+```
+
+컨테이너가 없어도 오류가 발생하지 않으면 정상이다.
+
+### 참고 사항
+
+- Windows 11 + WSL2 환경 권장
+- Docker Desktop 실행 상태에서만 Nexus Container를 실행할 수 있다.
 
 ### 3.2 권장 환경
 
