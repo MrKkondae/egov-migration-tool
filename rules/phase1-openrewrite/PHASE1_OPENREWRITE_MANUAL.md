@@ -75,25 +75,64 @@ mvn -version
 
 - [samples/asis/hello-egov-board/pom.xml](/C:/project/egov-migration-tool/samples/asis/hello-egov-board/pom.xml)
 
-### 5.1 Dry Run
+현재 권장 실행 순서는 아래와 같다.
+
+1. POM dry run -> patch 백업 -> POM run -> `validate`, `dependency:tree`
+2. Java dry run -> patch 백업 -> Java run -> `validate` 또는 `compile`
+3. XML dry run -> patch 백업 -> XML run -> `validate` 또는 XML 설정 점검
+4. 필요 시 마지막에 통합 dry run 또는 통합 run 검토
+
+`rewrite.patch` 는 각 dry run / run 실행 때마다 덮어써질 수 있으므로,
+각 단계 직후 별도 위치로 복사해 보관하는 것을 권장한다.
+
+권장 보관 폴더:
+
+* `output/rewrite-patches/`
+
+권장 파일명 규칙:
+
+* `{project}-{phase}-{mode}-{yyyymmdd}-{seq}.patch`
+
+예시:
+
+* `hello-egov-board-pom-dryrun-20260702-01.patch`
+* `hello-egov-board-java-dryrun-20260702-01.patch`
+* `hello-egov-board-xml-dryrun-20260702-01.patch`
+* `hello-egov-board-java-run-20260702-01.patch`
+
+사전 준비용 예시:
+
+```powershell
+New-Item -ItemType Directory -Force output/rewrite-patches | Out-Null
+```
+
+### 5.1 POM 검증
 
 ```powershell
 mvn -f samples/asis/hello-egov-board/pom.xml org.openrewrite.maven:rewrite-maven-plugin:6.11.0:dryRunNoFork -Drewrite.configLocation=../../../rules/phase1-openrewrite/pom/egovframe-coordinates.yml -Drewrite.activeRecipes=egov.migration.phase1.pom.EgovframeCoordinates
 ```
 
-확인 포인트:
+Dry run 확인 포인트:
 
 - `target/rewrite/rewrite.patch` 생성 여부
 - 신규 프로퍼티 추가 여부
 - 대상 eGovFrame 의존성만 전환되는지 여부
 
-### 5.2 실제 반영
+Dry run patch 백업 예시:
+
+```powershell
+Copy-Item `
+  samples/asis/hello-egov-board/target/rewrite/rewrite.patch `
+  output/rewrite-patches/hello-egov-board-pom-dryrun-20260702-01.patch
+```
+
+POM 실제 반영:
 
 ```powershell
 mvn -f samples/asis/hello-egov-board/pom.xml org.openrewrite.maven:rewrite-maven-plugin:6.11.0:runNoFork -Drewrite.configLocation=../../../rules/phase1-openrewrite/pom/egovframe-coordinates.yml -Drewrite.activeRecipes=egov.migration.phase1.pom.EgovframeCoordinates
 ```
 
-### 5.3 후속 검증
+Run 후 권장 검증:
 
 ```powershell
 mvn -f samples/asis/hello-egov-board/pom.xml validate
@@ -101,6 +140,118 @@ mvn -f samples/asis/hello-egov-board/pom.xml validate
 
 ```powershell
 mvn -f samples/asis/hello-egov-board/pom.xml dependency:tree
+```
+
+### 5.2 Java 검증
+
+Java 단계는 XML보다 먼저 검증하는 것을 권장한다.
+
+이유:
+
+* Java 단계는 주로 `import`, type, package 치환 중심이라 변경 범위가 상대적으로 선명하다.
+* XML 단계는 Spring bean class, validator, servlet, id generator, sql-map 연계 등 런타임 영향 범위가 더 넓다.
+
+Java dry run:
+
+```powershell
+mvn -f samples/asis/hello-egov-board/pom.xml org.openrewrite.maven:rewrite-maven-plugin:6.11.0:dryRunNoFork -Drewrite.configLocation=../../../rules/phase1-openrewrite/rewrite.yml -Drewrite.activeRecipes=egov.migration.phase1.JavaMigration
+```
+
+Java patch 확인 포인트:
+
+* `egovframework.rte...` -> `org.egovframe.rte...` 치환 여부
+* `egovframework.com...` 프로젝트 소스 패키지는 치환 대상이 아님을 전제로 검토
+* DAO / method-level refactoring 같은 phase1 범위 밖 변경이 없는지 확인
+
+Java dry run patch 백업 예시:
+
+```powershell
+Copy-Item `
+  samples/asis/hello-egov-board/target/rewrite/rewrite.patch `
+  output/rewrite-patches/hello-egov-board-java-dryrun-20260702-01.patch
+```
+
+Java 실제 반영:
+
+```powershell
+mvn -f samples/asis/hello-egov-board/pom.xml org.openrewrite.maven:rewrite-maven-plugin:6.11.0:runNoFork -Drewrite.configLocation=../../../rules/phase1-openrewrite/rewrite.yml -Drewrite.activeRecipes=egov.migration.phase1.JavaMigration
+```
+
+주의:
+
+* 현재 `JavaMigration` 실행 결과에는 Java 파일 외에 일부 XML 리소스가 함께 변경될 수 있다.
+* 따라서 run 이후에는 Java 변경과 XML 동반 변경을 같이 검토해야 한다.
+
+Java run 후 권장 검증:
+
+```powershell
+mvn -f samples/asis/hello-egov-board/pom.xml validate
+```
+
+필요 시:
+
+```powershell
+mvn -f samples/asis/hello-egov-board/pom.xml compile
+```
+
+### 5.3 XML 검증
+
+XML 단계는 Java 단계 검토가 끝난 뒤에 진행하는 것을 권장한다.
+
+XML dry run:
+
+```powershell
+mvn -f samples/asis/hello-egov-board/pom.xml org.openrewrite.maven:rewrite-maven-plugin:6.11.0:dryRunNoFork -Drewrite.configLocation=../../../rules/phase1-openrewrite/rewrite.yml -Drewrite.activeRecipes=egov.migration.phase1.XmlMigration
+```
+
+XML patch 확인 포인트:
+
+* Spring bean class, validator class, pagination / servlet 관련 class 치환 여부
+* sql-map 구조 변경이나 bean wiring 재설계처럼 phase1 범위 밖 변경이 없는지 확인
+* Java 단계에서 이미 함께 바뀐 XML과 중복 / 충돌이 없는지 확인
+
+XML dry run patch 백업 예시:
+
+```powershell
+Copy-Item `
+  samples/asis/hello-egov-board/target/rewrite/rewrite.patch `
+  output/rewrite-patches/hello-egov-board-xml-dryrun-20260702-01.patch
+```
+
+XML 실제 반영:
+
+```powershell
+mvn -f samples/asis/hello-egov-board/pom.xml org.openrewrite.maven:rewrite-maven-plugin:6.11.0:runNoFork -Drewrite.configLocation=../../../rules/phase1-openrewrite/rewrite.yml -Drewrite.activeRecipes=egov.migration.phase1.XmlMigration
+```
+
+XML run 후 권장 검증:
+
+```powershell
+mvn -f samples/asis/hello-egov-board/pom.xml validate
+```
+
+추가 점검 권장:
+
+* Spring XML 주요 파일 diff 확인
+* `WEB-INF` 설정 파일 diff 확인
+* validator / sql-map XML 영향 여부 확인
+
+### 5.4 통합 검증
+
+POM, Java, XML 개별 검토가 끝난 뒤에만 통합 검증을 권장한다.
+
+통합 dry run:
+
+```powershell
+mvn -f samples/asis/hello-egov-board/pom.xml org.openrewrite.maven:rewrite-maven-plugin:6.11.0:dryRunNoFork -Drewrite.configLocation=../../../rules/phase1-openrewrite/rewrite.yml -Drewrite.activeRecipes=egov.migration.phase1.FullMigration
+```
+
+통합 dry run patch 백업 예시:
+
+```powershell
+Copy-Item `
+  samples/asis/hello-egov-board/target/rewrite/rewrite.patch `
+  output/rewrite-patches/hello-egov-board-full-dryrun-20260702-01.patch
 ```
 
 ## 6. 이번 검증에서 실제 반영된 변경
