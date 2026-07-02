@@ -1,14 +1,12 @@
 # eGov Migration Tool
 
-전자정부프레임워크 3.x에서 4.3으로 전환하기 위한 절차, 규칙, 자동화 도구를 관리하는 프로젝트다.
+전자정부프레임워크 3.x 프로젝트를 4.3 기준으로 전환하기 위한 규칙, 자동화 도구, 검증 절차를 관리하는 저장소다.
 
----
+## 목표
 
-# 목표
+이 프로젝트의 목표는 한 번에 전체 전환을 끝내는 것이 아니라, 반복 가능한 규칙과 검증 절차를 정리해서 전환 작업의 예측 가능성을 높이는 것이다.
 
-본 프로젝트의 목표는 전환 작업을 일회성 대응이 아니라 재사용 가능한 절차와 도구로 정리하는 것이다.
-
-최종적으로는 아래 흐름을 기준으로 전환을 수행한다.
+전체 흐름은 아래와 같다.
 
 ```text
 AS-IS 분석
@@ -21,226 +19,88 @@ AS-IS 분석
     -> 전환 규칙 보강
 ```
 
----
-
-# 문서 안내
-
-프로젝트 문서는 아래처럼 역할별로 관리한다.
+## 문서 안내
 
 * `README.md`
-  프로젝트 목표, 전체 전환 흐름, Phase 정의, 문서 구조 안내
+  프로젝트 개요, 전체 전환 흐름, 현재 검증 상태
 * `docs/migration-process.md`
-  Phase1/Phase2 중심의 상세 수행 절차, 입력물/산출물, 검증 포인트
+  Phase1/Phase2 중심의 상세 수행 절차
+* `rules/phase1-openrewrite/PHASE1_OPENREWRITE_MANUAL.md`
+  OpenRewrite 기반 Phase1 실행 절차
+* `nexus/Nexus_구축가이드.md`
+  로컬 Nexus 구축 및 Maven 미러 설정
 * `tools/README.MD`
-  Python 도구 구조와 `run_phase2` 실행 방법
+  Python 기반 도구 실행 방법
 
-전환 관련 아키텍처, 분석 도구, 변환 도구 또한 문서 구조를 기준으로 정리한다.
+## Phase 정의
 
----
+### Phase1
 
-# 수행 주체
+OpenRewrite 기반의 보수적 자동 전환 단계다.
 
-| 단계 | OpenRewrite | Python | LLM | 전환담당자 |
-| --- | --- | --- | --- | --- |
-| AS-IS 분석 | - | 주관 | 보조 | 검토 |
-| TO-BE 조사 | - | - | 주관 | 검토 |
-| 전환 규칙 설계 | - | - | 주관 | 확인 |
-| Phase1 변환 | 주관 | - | - | 검토 |
-| Phase2 변환 | 보조 | 주관 | - | 검토 |
-| Phase3 변환 | - | - | 주관 | 확인 |
-| 컴파일 검증 | - | 주관 | 보조 | 검토 |
-| 규칙 보강 | - | - | 주관 | 확인 |
+주요 대상:
 
----
+* `pom.xml` 의존성 좌표 정리
+* Java import/package rename
+* XML 문자열 기반 안전 치환
 
-# 전환 절차 개요
+### Phase2
 
-## 1. AS-IS 인벤토리 수집
+Python 규칙 기반 구조 전환 단계다.
 
-현재 소스 구조와 기술 스택을 분석하여 전환 범위를 설계한다.
+주요 대상:
 
-주요 내용:
+* DAO 구조 전환
+* SQL Map -> MyBatis XML 구조 정리
+* Spring XML 구조 보완
 
-* Maven 프로젝트, 모듈, Java, JSP, SQL Map, Spring XML 수집
-* `pom.xml` 및 라이브러리 분석
-* iBatis, MyBatis, Security, Scheduler, Validator 등 기술 스택 파악
+### Phase3
 
-산출물
+LLM 기반 예외 보정 단계다.
 
-```text
-output/inventory/
-```
+주요 대상:
 
-## 2. TO-BE 후보 조사
+* 프로젝트별 특수 케이스
+* 동적 SQL, 커스텀 DAO, 복잡한 wiring
 
-전자정부프레임워크 4.3 기준 변경 사항과 전환 후보를 수집한다.
+## Phase1 현재 검증 범위
 
-주요 내용:
+현재까지 실제로 끝까지 검증된 범위는 Phase1 전체가 아니라 `POM eGovFrame 좌표 전환`이다.
 
-* eGovFrame Wiki, Release Note, Migration Guide 조사
-* 샘플 프로젝트와 기존 전환 후보 검토
-* `EgovAbstractDAO -> EgovAbstractMapper`
-* `sqlMapClient -> SqlSessionFactory`
-* `iBatis -> MyBatis`
+검증 완료 조건:
 
-산출물
+* `JDK 8` 환경에서 Maven 실행
+* 로컬 Nexus를 통한 의존성 해석
+* `dryRunNoFork`
+* `runNoFork`
+* `validate`
+* `dependency:tree`
 
-```text
-knowledge/
-```
+검증 대상:
 
-## 3. 전환 규칙 설계
+* `samples/asis/hello-egov-board/pom.xml`
 
-자동 변환 가능한 규칙을 정의하고 도구에 반영한다.
+현재 운영 기준:
 
-주요 대상
+* POM 전환 표준 진입점은 `rules/phase1-openrewrite/pom/egovframe-coordinates.yml`
+* `rules/phase1-openrewrite/rewrite.yml`은 전체 통합 진입점으로 유지
+* Java/XML 레시피는 아직 같은 수준으로 끝까지 검증되지 않았으므로 Phase1 전체 완료로 보지 않는다
 
-* `pom.xml` 규칙
-* DAO 규칙
-* SQL Map 규칙
-* Spring XML 규칙
-* Controller 규칙
-
-산출물
-
-```text
-rules/
-├── phase1-openrewrite/
-└── analysis/
-```
-
----
-
-# 전환 Phase 정의
-
-전자정부프레임워크 전환은 모든 항목을 같은 방식으로 처리할 수 없기 때문에, 변경 성격과 자동화 가능성에 따라 Phase 단위로 나눈다.
-
-## Phase1: OpenRewrite 기반 구조 변환
-
-특징:
-
-* 전후 매핑이 명확하다
-* 의미 변경 없이 대량 치환이 가능하다
-* 타입 레벨 의존성, 패키지, import 변경에 적합하다
-
-주요 대상
-
-* `egovframework.rte.* -> org.egovframe.rte.*`
-* Spring 3.x 계열 의존성 정리
-* Jackson 1.x -> 2.x 치환
-* `ojdbc14 -> ojdbc8`
-* logging 관련 타입/버전 치환
-
-대표 산출물
-
-```text
-converted/phase1/
-rules/phase1-openrewrite/
-```
-
-Phase1 실행 방법과 상세 절차는 아래 문서를 참고한다.
+상세 실행 방법은 아래 문서를 참고한다.
 
 * [Phase1 OpenRewrite Manual](./rules/phase1-openrewrite/PHASE1_OPENREWRITE_MANUAL.md)
 
-## Phase2: Python 규칙 기반 소스 변환
+## 산출물 기준
 
-특징:
+* Phase1 결과물: `rules/phase1-openrewrite/`, `converted/phase1/`
+* Phase2 결과물: `converted/phase2/`, `output/reports/`, `output/logs/`
+* 공통 검증 결과: `output/logs/`, `output/reports/`
 
-* 코드 구조 변경이 필요한 영역을 다룬다
-* OpenRewrite만으로 처리하기 어려운 변환을 Python이 주도한다
-* 변환 후 사용자 확인 또는 수동 검토 분류가 중요하다
+## 세부 문서
 
-주요 대상
-
-* DAO 상속 및 호출 패턴 변환
-* SQL Map에서 MyBatis XML로의 구조 변환
-* Spring XML의 `SqlMapClient` 연계 설정 정리
-* 예외 처리 경고와 수동 검토 대상 보고서 생성
-
-대표 산출물
-
-```text
-converted/phase2/
-output/reports/
-output/logs/
-```
-
-실행 방법과 상세 절차는 아래 문서를 참고한다.
-
-* `docs/migration-process.md`
-* `tools/README.MD`
-
-## Phase3: LLM 예외 보정
-
-특징:
-
-* 프로젝트별 맥락이 큰 영역을 다룬다
-* 정형화가 어렵거나 업무 코드 영향이 큰 항목을 보정한다
-
-주요 대상
-
-* 복잡한 Dynamic SQL
-* DAO API 세부 보정
-* 특수 Spring XML wiring
-* 스케줄러 연계 설정
-* 컴파일 오류 후속 수정
-
-대표 산출물
-
-```text
-output/reports/
-```
-
----
-
-# 자동 변환과 검증
-
-## 자동 변환
-
-전환 규칙을 이용해 Phase1과 Phase2 변환을 수행한다.
-
-* Phase1: Dependency, Maven 구조, import 정리
-* Phase2: DAO, SQL Map, Spring XML 변환
-
-산출물
-
-```text
-converted/
-```
-
-## 컴파일 검증
-
-전환 결과가 정상 동작하는지 검증한다.
-
-주요 내용:
-
-* `mvn clean compile`
-* import 오류, dependency 오류, API 변경 오류, mapper 오류 분석
-* `자동 수정 가능`, `규칙 추가 필요`, `수동 검토 필요`로 분류
-
-산출물
-
-```text
-output/logs/
-output/reports/
-```
-
-## 전환 규칙 보강
-
-검증 과정에서 발견한 오류를 규칙에 반영하여 재사용성을 높인다.
-
-예:
-
-```text
-import egovframework.rte.psl.dataaccess.EgovAbstractMapper;
--> import org.egovframe.rte.psl.dataaccess.EgovAbstractMapper;
-```
-
----
-
-# 상세 문서
-
-* [전환 수행절차](./docs/migration-process.md)
+* [전환 수행 절차](./docs/migration-process.md)
+* [OpenRewrite Phase1 매뉴얼](./rules/phase1-openrewrite/PHASE1_OPENREWRITE_MANUAL.md)
+* [로컬 Nexus 구축 가이드](./nexus/Nexus_구축가이드.md)
 * [도구 사용 안내](./tools/README.MD)
 * [전환 아키텍처](./tools/CONVERSION_ARCHITECTURE.md)
 * [sqlMapClient 분석기 문서](./tools/SQLMAPCLIENT_USAGE_ANALYZER.md)

@@ -5,6 +5,10 @@ description: >
   Composite Maven dependency migration recipe for eGovFrame 3.1 to 4.3.
   This recipe delegates actual pom.xml dependency changes to focused
   sub-recipes under rules/phase1-openrewrite/pom.
+  Reference-only in the current execution flow. Prefer
+  rules/phase1-openrewrite/rewrite.yml or
+  rules/phase1-openrewrite/pom/egovframe-coordinates.yml as the actual
+  configLocation entry point.
 
 recipeList:
   - egov.migration.phase1.pom.EgovframeCoordinates

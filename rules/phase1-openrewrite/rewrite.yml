@@ -52,57 +52,199 @@ type: specs.openrewrite.org/v1beta/recipe
 name: egov.migration.phase1.pom.EgovframeCoordinates
 displayName: eGovFrame 3.1 to 4.3 - eGovFrame Coordinates
 description: >
-  High-confidence 1:1 Maven coordinate migration for eGovFrame RTE
-  dependencies from eGovFrame 3.1 to 4.3.
+  Composite recipe that runs eGovFrame RTE migration in two steps. First add
+  a dedicated 4.3 property without touching the legacy 3.1 property. Then
+  rename only the stable modules and switch their version references to the
+  new 4.3 property.
 
 recipeList:
-  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
-      oldGroupId: egovframework.rte
-      oldArtifactId: egovframework.rte.fdl.cmmn
-      newGroupId: org.egovframe.rte
-      newArtifactId: org.egovframe.rte.fdl.cmmn
-      newVersion: "4.3.0"
-      changeManagedDependency: true
+  - egov.migration.phase1.pom.EgovframeCoordinatesPrepare43Property
+  - egov.migration.phase1.pom.EgovframeCoordinatesSwitchStableModules
 
-  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
-      oldGroupId: egovframework.rte
-      oldArtifactId: egovframework.rte.fdl.idgnr
-      newGroupId: org.egovframe.rte
-      newArtifactId: org.egovframe.rte.fdl.idgnr
-      newVersion: "4.3.0"
-      changeManagedDependency: true
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: egov.migration.phase1.pom.EgovframeCoordinatesPrepare43Property
+displayName: eGovFrame 3.1 to 4.3 - Prepare 4.3 Property
+description: >
+  Step 1 for eGovFrame RTE migration. Keep the legacy 3.1 property as-is and
+  create or update a separate property for the validated 4.3 modules.
 
-  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
-      oldGroupId: egovframework.rte
-      oldArtifactId: egovframework.rte.fdl.logging
-      newGroupId: org.egovframe.rte
-      newArtifactId: org.egovframe.rte.fdl.logging
-      newVersion: "4.3.0"
-      changeManagedDependency: true
+recipeList:
+  - org.openrewrite.maven.ChangePropertyValue:
+      key: org.egovframe.rte.version
+      newValue: 4.3.0
+      addIfMissing: true
+      trustParent: false
 
-  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
-      oldGroupId: egovframework.rte
-      oldArtifactId: egovframework.rte.fdl.property
-      newGroupId: org.egovframe.rte
-      newArtifactId: org.egovframe.rte.fdl.property
-      newVersion: "4.3.0"
-      changeManagedDependency: true
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: egov.migration.phase1.pom.EgovframeCoordinatesSwitchStableModules
+displayName: eGovFrame 3.1 to 4.3 - Switch Stable Modules To 4.3 Property
+description: >
+  Step 2 for eGovFrame RTE migration. Rename validated modules from legacy
+  egovframework coordinates to org.egovframe coordinates and switch only
+  those modules to the dedicated 4.3 property reference.
 
-  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
-      oldGroupId: egovframework.rte
-      oldArtifactId: egovframework.rte.psl.dataaccess
-      newGroupId: org.egovframe.rte
-      newArtifactId: org.egovframe.rte.psl.dataaccess
-      newVersion: "4.3.0"
-      changeManagedDependency: true
+recipeList:
+  - org.openrewrite.text.FindAndReplace:
+      find: '(?s)(<dependency>\s*<groupId>egovframework\.rte</groupId>\s*<artifactId>egovframework\.rte\.fdl\.cmmn</artifactId>\s*<version>)(?:\$\{egovframework\.rte\.version\}|4\.3\.0)(</version>)'
+      replace: '$1\${org.egovframe.rte.version}$2'
+      regex: true
+      caseSensitive: true
+      multiline: true
+      dotAll: true
+      filePattern: '**/pom.xml'
+      plaintextOnly: false
 
-  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
-      oldGroupId: egovframework.rte
-      oldArtifactId: egovframework.rte.ptl.mvc
-      newGroupId: org.egovframe.rte
-      newArtifactId: org.egovframe.rte.ptl.mvc
-      newVersion: "4.3.0"
-      changeManagedDependency: true
+  - org.openrewrite.text.FindAndReplace:
+      find: '(?s)(<dependency>\s*<groupId>egovframework\.rte</groupId>\s*<artifactId>egovframework\.rte\.fdl\.idgnr</artifactId>\s*<version>)(?:\$\{egovframework\.rte\.version\}|4\.3\.0)(</version>)'
+      replace: '$1\${org.egovframe.rte.version}$2'
+      regex: true
+      caseSensitive: true
+      multiline: true
+      dotAll: true
+      filePattern: '**/pom.xml'
+      plaintextOnly: false
+
+  - org.openrewrite.text.FindAndReplace:
+      find: '(?s)(<dependency>\s*<groupId>egovframework\.rte</groupId>\s*<artifactId>egovframework\.rte\.fdl\.logging</artifactId>\s*<version>)(?:\$\{egovframework\.rte\.version\}|4\.3\.0)(</version>)'
+      replace: '$1\${org.egovframe.rte.version}$2'
+      regex: true
+      caseSensitive: true
+      multiline: true
+      dotAll: true
+      filePattern: '**/pom.xml'
+      plaintextOnly: false
+
+  - org.openrewrite.text.FindAndReplace:
+      find: '(?s)(<dependency>\s*<groupId>egovframework\.rte</groupId>\s*<artifactId>egovframework\.rte\.fdl\.property</artifactId>\s*<version>)(?:\$\{egovframework\.rte\.version\}|4\.3\.0)(</version>)'
+      replace: '$1\${org.egovframe.rte.version}$2'
+      regex: true
+      caseSensitive: true
+      multiline: true
+      dotAll: true
+      filePattern: '**/pom.xml'
+      plaintextOnly: false
+
+  - org.openrewrite.text.FindAndReplace:
+      find: '(?s)(<dependency>\s*<groupId>egovframework\.rte</groupId>\s*<artifactId>egovframework\.rte\.fdl\.security</artifactId>\s*<version>)(?:\$\{egovframework\.rte\.version\}|4\.3\.0)(</version>)'
+      replace: '$1\${org.egovframe.rte.version}$2'
+      regex: true
+      caseSensitive: true
+      multiline: true
+      dotAll: true
+      filePattern: '**/pom.xml'
+      plaintextOnly: false
+
+  - org.openrewrite.text.FindAndReplace:
+      find: '(?s)(<dependency>\s*<groupId>egovframework\.rte</groupId>\s*<artifactId>egovframework\.rte\.psl\.dataaccess</artifactId>\s*<version>)(?:\$\{egovframework\.rte\.version\}|4\.3\.0)(</version>)'
+      replace: '$1\${org.egovframe.rte.version}$2'
+      regex: true
+      caseSensitive: true
+      multiline: true
+      dotAll: true
+      filePattern: '**/pom.xml'
+      plaintextOnly: false
+
+  - org.openrewrite.text.FindAndReplace:
+      find: '(?s)(<dependency>\s*<groupId>egovframework\.rte</groupId>\s*<artifactId>egovframework\.rte\.ptl\.mvc</artifactId>\s*<version>)(?:\$\{egovframework\.rte\.version\}|4\.3\.0)(</version>)'
+      replace: '$1\${org.egovframe.rte.version}$2'
+      regex: true
+      caseSensitive: true
+      multiline: true
+      dotAll: true
+      filePattern: '**/pom.xml'
+      plaintextOnly: false
+
+  - org.openrewrite.text.FindAndReplace:
+      find: '(?s)(<dependency>\s*<groupId>egovframework\.rte</groupId>\s*<artifactId>egovframework\.rte\.fdl\.excel</artifactId>\s*<version>)(?:\$\{egovframework\.rte\.version\}|4\.3\.0)(</version>)'
+      replace: '$1\${org.egovframe.rte.version}$2'
+      regex: true
+      caseSensitive: true
+      multiline: true
+      dotAll: true
+      filePattern: '**/pom.xml'
+      plaintextOnly: false
+
+  - org.openrewrite.text.FindAndReplace:
+      find: '(?s)(<dependency>\s*<groupId>)egovframework\.rte(</groupId>\s*<artifactId>)egovframework\.rte\.fdl\.cmmn(</artifactId>)'
+      replace: '$1org.egovframe.rte$2org.egovframe.rte.fdl.cmmn$3'
+      regex: true
+      caseSensitive: true
+      multiline: true
+      dotAll: true
+      filePattern: '**/pom.xml'
+      plaintextOnly: false
+
+  - org.openrewrite.text.FindAndReplace:
+      find: '(?s)(<dependency>\s*<groupId>)egovframework\.rte(</groupId>\s*<artifactId>)egovframework\.rte\.fdl\.idgnr(</artifactId>)'
+      replace: '$1org.egovframe.rte$2org.egovframe.rte.fdl.idgnr$3'
+      regex: true
+      caseSensitive: true
+      multiline: true
+      dotAll: true
+      filePattern: '**/pom.xml'
+      plaintextOnly: false
+
+  - org.openrewrite.text.FindAndReplace:
+      find: '(?s)(<dependency>\s*<groupId>)egovframework\.rte(</groupId>\s*<artifactId>)egovframework\.rte\.fdl\.logging(</artifactId>)'
+      replace: '$1org.egovframe.rte$2org.egovframe.rte.fdl.logging$3'
+      regex: true
+      caseSensitive: true
+      multiline: true
+      dotAll: true
+      filePattern: '**/pom.xml'
+      plaintextOnly: false
+
+  - org.openrewrite.text.FindAndReplace:
+      find: '(?s)(<dependency>\s*<groupId>)egovframework\.rte(</groupId>\s*<artifactId>)egovframework\.rte\.fdl\.property(</artifactId>)'
+      replace: '$1org.egovframe.rte$2org.egovframe.rte.fdl.property$3'
+      regex: true
+      caseSensitive: true
+      multiline: true
+      dotAll: true
+      filePattern: '**/pom.xml'
+      plaintextOnly: false
+
+  - org.openrewrite.text.FindAndReplace:
+      find: '(?s)(<dependency>\s*<groupId>)egovframework\.rte(</groupId>\s*<artifactId>)egovframework\.rte\.fdl\.security(</artifactId>)'
+      replace: '$1org.egovframe.rte$2org.egovframe.rte.fdl.security$3'
+      regex: true
+      caseSensitive: true
+      multiline: true
+      dotAll: true
+      filePattern: '**/pom.xml'
+      plaintextOnly: false
+
+  - org.openrewrite.text.FindAndReplace:
+      find: '(?s)(<dependency>\s*<groupId>)egovframework\.rte(</groupId>\s*<artifactId>)egovframework\.rte\.psl\.dataaccess(</artifactId>)'
+      replace: '$1org.egovframe.rte$2org.egovframe.rte.psl.dataaccess$3'
+      regex: true
+      caseSensitive: true
+      multiline: true
+      dotAll: true
+      filePattern: '**/pom.xml'
+      plaintextOnly: false
+
+  - org.openrewrite.text.FindAndReplace:
+      find: '(?s)(<dependency>\s*<groupId>)egovframework\.rte(</groupId>\s*<artifactId>)egovframework\.rte\.ptl\.mvc(</artifactId>)'
+      replace: '$1org.egovframe.rte$2org.egovframe.rte.ptl.mvc$3'
+      regex: true
+      caseSensitive: true
+      multiline: true
+      dotAll: true
+      filePattern: '**/pom.xml'
+      plaintextOnly: false
+
+  - org.openrewrite.text.FindAndReplace:
+      find: '(?s)(<dependency>\s*<groupId>)egovframework\.rte(</groupId>\s*<artifactId>)egovframework\.rte\.fdl\.excel(</artifactId>)'
+      replace: '$1org.egovframe.rte$2org.egovframe.rte.fdl.excel$3'
+      regex: true
+      caseSensitive: true
+      multiline: true
+      dotAll: true
+      filePattern: '**/pom.xml'
+      plaintextOnly: false
 
 ---
 type: specs.openrewrite.org/v1beta/recipe

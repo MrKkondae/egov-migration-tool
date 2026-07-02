@@ -5,6 +5,9 @@ description: >
   Composite Java source migration recipe for eGovFrame 3.1 to 4.3.
   This phase only includes conservative package and type changes that can be
   inferred safely without access to the closed-network source code.
+  Reference-only in the current execution flow. Prefer
+  rules/phase1-openrewrite/rewrite.yml as the actual configLocation entry
+  point for integrated execution.
 
 recipeList:
   - egov.migration.phase1.java.EgovPackageRenames

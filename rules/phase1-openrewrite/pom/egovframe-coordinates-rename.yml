@@ -1,0 +1,13 @@
+type: specs.openrewrite.org/v1beta/recipe
+name: egov.migration.phase1.pom.EgovframeCoordinatesPrepare43Property
+displayName: eGovFrame 3.1 to 4.3 - Prepare 4.3 Property
+description: >
+  Step 1 for eGovFrame RTE migration. Keep the legacy 3.1 property as-is and
+  create or update a separate property for the validated 4.3 modules.
+
+recipeList:
+  - org.openrewrite.maven.ChangePropertyValue:
+      key: org.egovframe.rte.version
+      newValue: 4.3.0
+      addIfMissing: true
+      trustParent: false

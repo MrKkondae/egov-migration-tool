@@ -1,278 +1,238 @@
-# Phase1 OpenRewrite 전환 매뉴얼
+# Phase1 OpenRewrite Manual
 
 ## 1. 목적
 
-이 문서는 `rules/phase1-openrewrite`에 정의된 OpenRewrite 레시피를 사용해
-eGovFrame 3.1 기반 프로젝트를 eGovFrame 4.3 기준으로 1차 자동 전환하는 방법을 정리한다.
+이 문서는 `rules/phase1-openrewrite` 하위 레시피를 사용해 eGovFrame 3.x 기반 프로젝트를 eGovFrame 4.3 기준으로 1차 자동 전환하는 방법을 정리한다.
 
-Phase 1의 목표는 다음과 같다.
+현재까지 실제 검증이 끝난 범위는 `pom.xml`의 eGovFrame RTE 좌표 전환이다.
 
-- `pom.xml`의 비교적 안전한 dependency 좌표 및 버전 변경
-- Java 소스의 패키지명 및 타입명 변경
-- XML 설정의 문자열 기반 클래스명 변경
-- 대규모 구조 변경이 필요한 항목은 제외하고, 자동화 가능한 범위만 우선 적용
+검증 완료 범위:
 
-이 단계는 "전체 마이그레이션 완료"가 아니라 "보수적인 1차 자동 변환"이다.
+- JDK 8 환경에서 OpenRewrite Maven Plugin 실행
+- 로컬 Nexus 연동 환경에서 `dryRunNoFork` / `runNoFork` 수행
+- `samples/asis/hello-egov-board/pom.xml` 대상 좌표 전환
+- 전환 후 `validate`, `dependency:tree` 성공
 
-## 2. 현재 실행 구조
+## 2. 현재 권장 실행 방식
 
-현재 진입점은 다음 두 파일이다.
+현재 기준에서 가장 안정적인 실행 방식은 다음과 같다.
 
-- OpenRewrite 설정 파일: [rewrite.yml](/C:/project/egov-migration-tool/rules/phase1-openrewrite/rewrite.yml)
-- Maven 플러그인 설정: [pom.xml](/C:/project/egov-migration-tool/pom.xml)
+1. JDK 8로 Maven 실행
+2. 로컬 Nexus를 통해 의존성 해석
+3. `dryRunNoFork`로 변경 예정 확인
+4. `runNoFork`로 실제 반영
+5. `validate`, `dependency:tree`로 후속 검증
 
-실제 실행 시 Maven은 `pom.xml`에서 아래 설정을 사용한다.
+중요:
 
-- `configLocation`: `${project.basedir}/rules/phase1-openrewrite/rewrite.yml`
-- `activeRecipes`: `egov.migration.phase1.FullMigration`
+- `rewrite:dryRun`, `rewrite:run`은 Maven lifecycle을 더 깊게 타므로 환경에 따라 불필요한 컴파일 오류가 먼저 드러날 수 있다.
+- 현재 샘플 검증은 `dryRunNoFork`, `runNoFork` 기준으로 통과했다.
+- `AS-IS pom.xml`을 손으로 수정하는 방식보다 실행 환경을 맞추는 방식이 우선이다.
 
-즉, `rewrite.yml` 하나만 로드하면 그 안에서 Phase 1 전체 레시피를 모두 해석하는 구조다.
+## 3. 사전 준비
 
-## 3. 레시피 구성
+### 3.1 JDK
 
-`rewrite.yml`의 최상위 진입 레시피는 `egov.migration.phase1.FullMigration`이다.
+- OpenRewrite 실행용 JDK는 우선 `JDK 8`을 권장한다.
+- `JAVA_HOME`은 `bin`이 아닌 JDK 홈 디렉터리를 가리켜야 한다.
 
-이 레시피는 아래 3개 composite recipe를 순차적으로 포함한다.
+예시:
 
-1. `egov.migration.phase1.PomDependencyMigration`
-2. `egov.migration.phase1.JavaMigration`
-3. `egov.migration.phase1.XmlMigration`
+```powershell
+$env:JAVA_HOME="C:\Program Files\Java\jdk1.8.0_491"
+$env:Path="$env:JAVA_HOME\bin;$env:Path"
+java -version
+mvn -version
+```
 
-각 영역의 역할은 다음과 같다.
+### 3.2 저장소
 
-### 3.1 POM 변환
+- Maven Central 직접 접근 대신 로컬 Nexus 사용을 권장한다.
+- 폐쇄망 또는 준폐쇄망에서는 Nexus가 사실상 필수에 가깝다.
 
-대상:
+### 3.3 대상 프로젝트
 
-- eGovFrame RTE 좌표 변경
-- Spring 버전 업그레이드
-- 로깅 관련 라이브러리 버전 업그레이드
-- Jackson 1.x -> 2.x 좌표 전환
-- MyBatis / MyBatis-Spring 버전 정리
-- Oracle JDBC 좌표 정리
-- JSTL / standard 의존성 정리
-- 일부 공통 라이브러리 버전 업그레이드
+- 대상 프로젝트는 `mvn validate` 또는 `dependency:tree` 수준의 기본 해석이 가능해야 한다.
+- `pom.xml` 백업 또는 Git 브랜치 분리는 필수다.
 
-### 3.2 Java 변환
+## 4. 검증 완료된 POM 전환 레시피
 
-대상:
+현재 실사용 기준 POM 전환 진입점은 아래 파일이다.
 
-- `egovframework.rte.*` -> `org.egovframe.rte.*`
-- Jackson 1.x 패키지 및 타입 -> Jackson 2.x
-- `MappingJacksonHttpMessageConverter` -> `MappingJackson2HttpMessageConverter`
+- [egovframe-coordinates.yml](/C:/project/egov-migration-tool/rules/phase1-openrewrite/pom/egovframe-coordinates.yml)
 
-### 3.3 XML 변환
+이 파일은 단일 실행형으로 정리되어 있으며 아래 하위 레시피를 내부에 포함한다.
 
-대상:
+- `egov.migration.phase1.pom.EgovframeCoordinates`
+- `egov.migration.phase1.pom.EgovframeCoordinatesPrepare43Property`
+- `egov.migration.phase1.pom.EgovframeCoordinatesSwitchStableModules`
 
-- XML 내부 문자열 기반 `egovframework.rte` 패키지명 변경
-- XML 내부 `MappingJacksonHttpMessageConverter` 문자열 변경
+즉, `configLocation`을 이 파일 하나로 지정해도 바로 실행 가능하다.
 
-## 4. 사전 준비
+## 5. 실제 검증 명령
 
-실행 전 아래 사항을 확인한다.
+대상 샘플 프로젝트:
 
-1. 대상 프로젝트는 Git 등으로 백업 또는 브랜치 분리되어 있어야 한다.
-2. JDK 버전은 최소 Java 17 기준으로 맞추는 것을 권장한다.
-3. Maven 실행 환경이 준비되어 있어야 한다.
-4. 대상 프로젝트는 변환 전 빌드 상태와 핵심 기능 동작 상태를 가능한 한 기록해둔다.
-
-권장 사전 작업:
-
-- 변환 전 `mvn -q -DskipTests package` 또는 프로젝트 표준 빌드 수행
-- 주요 `pom.xml`, Spring XML, DAO 계층 구조 확인
-- iBatis, DBCP 1.x, Log4j 1.x 사용 여부 사전 파악
-
-## 5. 실행 방법
-
-프로젝트 루트에서 아래 순서로 진행한다.
+- [samples/asis/hello-egov-board/pom.xml](/C:/project/egov-migration-tool/samples/asis/hello-egov-board/pom.xml)
 
 ### 5.1 Dry Run
 
-먼저 변경 예정 사항만 확인한다.
-
-```bash
-mvn rewrite:dryRun
+```powershell
+mvn -f samples/asis/hello-egov-board/pom.xml org.openrewrite.maven:rewrite-maven-plugin:6.11.0:dryRunNoFork -Drewrite.configLocation=../../../rules/phase1-openrewrite/pom/egovframe-coordinates.yml -Drewrite.activeRecipes=egov.migration.phase1.pom.EgovframeCoordinates
 ```
 
 확인 포인트:
 
-- 어떤 파일이 변경 대상인지
-- 의존성 좌표 변경이 기대와 맞는지
-- Java import/type 치환 범위가 과도하지 않은지
-- XML 텍스트 치환 결과가 안전한지
+- `target/rewrite/rewrite.patch` 생성 여부
+- 신규 프로퍼티 추가 여부
+- 대상 eGovFrame 의존성만 전환되는지 여부
 
 ### 5.2 실제 반영
 
-Dry Run 결과를 검토한 뒤 실제 반영한다.
-
-```bash
-mvn rewrite:run
+```powershell
+mvn -f samples/asis/hello-egov-board/pom.xml org.openrewrite.maven:rewrite-maven-plugin:6.11.0:runNoFork -Drewrite.configLocation=../../../rules/phase1-openrewrite/pom/egovframe-coordinates.yml -Drewrite.activeRecipes=egov.migration.phase1.pom.EgovframeCoordinates
 ```
 
 ### 5.3 후속 검증
 
-반영 후에는 반드시 빌드와 기본 동작 검증을 수행한다.
-
-예시:
-
-```bash
-mvn clean package
+```powershell
+mvn -f samples/asis/hello-egov-board/pom.xml validate
 ```
 
-가능하면 아래도 함께 확인한다.
+```powershell
+mvn -f samples/asis/hello-egov-board/pom.xml dependency:tree
+```
 
-- 애플리케이션 기동
-- Spring context 로딩
-- 주요 화면 진입
-- DAO / 트랜잭션 / JSON 직렬화 관련 기능
+## 6. 이번 검증에서 실제 반영된 변경
 
-## 6. 자동 변환 범위
+샘플 프로젝트 기준으로 아래 변경이 정상 반영되었다.
 
-현재 Phase 1에서 자동 변환되는 대표 항목은 다음과 같다.
+- 신규 프로퍼티 추가
+  - `<org.egovframe.rte.version>4.3.0</org.egovframe.rte.version>`
+- 기존 프로퍼티 유지
+  - `<egovframework.rte.version>3.1.0</egovframework.rte.version>`
+- 아래 6개 의존성만 `org.egovframe.rte`로 전환
+  - `ptl.mvc`
+  - `psl.dataaccess`
+  - `fdl.idgnr`
+  - `fdl.property`
+  - `fdl.security`
+  - `fdl.excel`
 
-### 6.1 eGovFrame 좌표 변경
+이 방식의 장점은 기존 3.x 프로퍼티를 그대로 남겨 두고, 검증된 모듈만 4.3 전용 프로퍼티를 참조하게 만든다는 점이다.
 
-- `egovframework.rte:*` 일부 핵심 모듈
-- `org.egovframe.rte:*` 4.3.0 기준으로 변경
+## 7. WARNING 해석 기준
 
-대표 예:
+실행 중 발생하는 WARNING은 크게 두 종류로 본다.
 
-- `egovframework.rte:egovframework.rte.fdl.cmmn`
-- `egovframework.rte:egovframework.rte.psl.dataaccess`
-- `egovframework.rte:egovframework.rte.ptl.mvc`
+### 7.1 허용 가능한 WARNING
 
-### 6.2 Jackson 전환
+- `These recipes would make changes ...`
+- `Changes have been made ...`
+- `Patch file available ...`
+- `Please review and commit the results.`
 
-POM:
+이 경고들은 OpenRewrite가 정상 동작했다는 뜻이다.
 
-- `org.codehaus.jackson:jackson-core-asl` -> `com.fasterxml.jackson.core:jackson-core`
-- `org.codehaus.jackson:jackson-mapper-asl` -> `com.fasterxml.jackson.core:jackson-databind`
+### 7.2 별도 관리가 필요한 WARNING
 
-Java:
+- `maven-surefire-plugin version missing`
+- `${artifactId}`, `${version}` deprecated
 
-- `org.codehaus.jackson.map.ObjectMapper` -> `com.fasterxml.jackson.databind.ObjectMapper`
-- `org.codehaus.jackson.JsonNode` -> `com.fasterxml.jackson.databind.JsonNode`
-- `org.codehaus.jackson.type.TypeReference` -> `com.fasterxml.jackson.core.type.TypeReference`
+이 경고들은 현재 전환 실패 원인은 아니지만, 원본 POM 품질 이슈로 따로 정리해 둘 필요가 있다.
 
-XML/Java 보조 전환:
+## 8. 레시피 사용 현황
 
-- `MappingJacksonHttpMessageConverter` -> `MappingJackson2HttpMessageConverter`
+### 8.1 현재 직접 사용하는 레시피/진입점
 
-### 6.3 버전 업그레이드
+- [rules/phase1-openrewrite/pom/egovframe-coordinates.yml](/C:/project/egov-migration-tool/rules/phase1-openrewrite/pom/egovframe-coordinates.yml)
+  - 현재 검증 완료된 단일 실행형 POM 전환 진입점
+- [rules/phase1-openrewrite/rewrite.yml](/C:/project/egov-migration-tool/rules/phase1-openrewrite/rewrite.yml)
+  - 루트 `pom.xml` 기준 전체 통합 진입점
 
-대표 대상:
+### 8.2 분할 실행용으로 유지하는 레시피
 
-- Spring 5.3.37
-- SLF4J 1.7.36
-- Log4j2 2.17.1
-- MyBatis 3.5.16
-- MyBatis-Spring 2.1.2
-- `ojdbc8` 19.22.0.0
+- [egovframe-coordinates-rename.yml](/C:/project/egov-migration-tool/rules/phase1-openrewrite/pom/egovframe-coordinates-rename.yml)
+  - 1단계만 따로 실행할 때 사용 가능
+- [egovframe-coordinates-version-upgrade.yml](/C:/project/egov-migration-tool/rules/phase1-openrewrite/pom/egovframe-coordinates-version-upgrade.yml)
+  - 2단계만 따로 실행할 때 사용 가능
 
-## 7. 자동 변환에서 제외한 항목
+### 8.3 현재 직접 실행 경로에서는 사용하지 않는 레시피
 
-아래 항목은 의도적으로 Phase 1 자동 변환에서 제외했다.
+아래 파일들은 현재 실사용 명령 흐름에서 직접 사용되지 않는다.
 
-### 7.1 DAO 구현 구조 변경
+- [01.pom-dependency-migration.yml](/C:/project/egov-migration-tool/rules/phase1-openrewrite/01.pom-dependency-migration.yml)
+- [02.java-migration.yml](/C:/project/egov-migration-tool/rules/phase1-openrewrite/02.java-migration.yml)
+- [03.xml-migration.yml](/C:/project/egov-migration-tool/rules/phase1-openrewrite/03.xml-migration.yml)
 
-예:
+이 파일들은 현재 기준으로는 “설계 참조용” 성격이 강하다.
 
-- `EgovAbstractDAO` -> `EgovAbstractMapper`
-- `EgovComAbstractDAO` 기반 커스텀 DAO
+이유:
 
-제외 이유:
+- 실제 실행은 `rewrite.yml` 내부 정의 또는 `pom/egovframe-coordinates.yml` 단일 실행형 기준으로 이뤄지고 있다.
+- `01/02/03` 파일만 단독 `configLocation`으로 주면 하위 레시피 해석 문제가 생길 수 있다.
+- 따라서 당장은 삭제보다 “참조용 유지”가 안전하다.
 
-- iBatis / MyBatis 혼재 여부 확인 필요
-- 상속 구조와 공통 래퍼 클래스 존재 가능
-- 메서드 시그니처 및 호출 방식 수동 점검 필요
+## 9. 정리 권장안
 
-### 7.2 XML 기반 MyBatis 전환
+현재 기준 추천 정리는 다음과 같다.
 
-예:
+1. `pom/egovframe-coordinates.yml`을 POM 전환 표준 진입점으로 고정
+2. `rewrite.yml`은 전체 통합 진입점으로 유지
+3. `01/02/03`은 참조용 파일로 간주하고 문서에만 역할 명시
+4. Java/XML 단계 검증이 끝나기 전까지는 섣불리 삭제하지 않음
 
-- `SqlMapClientFactoryBean` -> `SqlSessionFactoryBean`
+## 10. 다음 작업
 
-제외 이유:
+다음 우선순위는 아래 둘 중 하나다.
 
-- bean wiring 구조 변경 가능
-- `configLocation`, mapper 설정 구조 재설계 필요
+1. 현재 성공한 POM 전환 절차를 표준 운영 절차로 고정
+2. Java/XML 레시피를 같은 방식으로 샘플 검증
 
-### 7.3 DBCP1 -> DBCP2 구조 변경
+권장 순서:
 
-예:
+1. 현재 `pom.xml` 상태 백업 또는 커밋
+2. Java 레시피 검증
+3. XML 레시피 검증
+4. 검증 완료 후 미사용 레시피 재정리
 
-- `org.apache.commons.dbcp.BasicDataSource`
-- `org.apache.commons.dbcp2.BasicDataSource`
+## 11. 진입점 역할 구분
 
-제외 이유:
+현재 문서 기준으로 혼동하기 쉬운 두 파일의 역할은 아래와 같다.
 
-- XML bean property 호환성 점검 필요
-- 풀 설정 속성명이 달라질 수 있음
+### 11.1 `pom/egovframe-coordinates.yml`
 
-### 7.4 Log4j 1.x API -> SLF4J 코드 전환
+이 파일은 현재 실제 운영에 가장 가까운 POM 전환 표준 진입점이다.
 
-제외 이유:
+특징:
 
-- 필드 선언, 초기화, 호출 패턴 변경 필요
-- 단순 import 치환만으로 끝나지 않음
+* 단일 실행형
+* `configLocation`으로 직접 지정 가능
+* 샘플 프로젝트에서 `dryRunNoFork`, `runNoFork`, `validate`, `dependency:tree`까지 검증 완료
 
-## 8. 실행 후 반드시 점검할 항목
+즉, POM 전환만 수행할 때는 이 파일을 우선 사용한다.
 
-### 8.1 POM 관련
+### 11.2 `rewrite.yml`
 
-- `dependencyManagement`까지 기대대로 바뀌었는지
-- 사내 저장소 또는 폐쇄망 저장소에서 새 좌표를 해석 가능한지
-- JSTL 변경 후 JSP 컴파일에 문제가 없는지
-- `systemPath` 기반 JDBC jar 참조가 남아 있지 않은지
+이 파일은 전체 Phase1 통합 진입점이다.
 
-### 8.2 Java 관련
+특징:
 
-- Jackson 2.x 전환 후 컴파일 오류가 없는지
-- deprecated API 또는 패키지 이동으로 인한 추가 수정이 필요한지
-- 커스텀 DAO 상속 구조가 그대로 남아 있는지
+* POM, Java, XML 레시피를 한 번에 묶는 용도
+* 루트 `pom.xml`과 연결되는 통합 진입점
+* 현재는 보관 및 통합 설계 관점에서 유지
 
-### 8.3 XML 관련
+주의:
 
-- Spring bean class 문자열 치환 결과가 실제 클래스와 맞는지
-- 메시지 컨버터 bean 설정이 런타임에서 정상 로딩되는지
-- 단순 문자열 치환이 의도치 않은 텍스트까지 바꾸지 않았는지
+* Java/XML 레시피는 아직 POM 단계와 동일한 수준으로 끝까지 검증되지 않았다
+* 따라서 현재 운영 기준에서는 `rewrite.yml`을 “전체 자동 전환 완료 진입점”으로 보기보다 “통합용 진입점”으로 이해하는 것이 맞다
 
-## 9. 운영 시 주의사항
+## 12. 현재 운영 기준 요약
 
-1. `rewrite.yml`이 현재 단일 진입점이다. Phase 1 전체 적용은 이 파일을 기준으로 실행한다.
-2. `01.pom-dependency-migration.yml`, `02.java-migration.yml`, `03.xml-migration.yml`과 `pom/java/xml` 하위 YAML들은 설계 참고용으로 볼 수 있지만, 현재 실제 실행은 `rewrite.yml` 중심이다.
-3. 레시피 버전을 변경할 때는 `rewrite.yml` 내부 정의를 기준으로 일관되게 수정해야 한다.
-4. 자동 변환 후에는 반드시 빌드와 런타임 검증을 수행해야 한다.
-5. Phase 1 결과만으로 eGovFrame 4.3 완전 호환을 보장하지 않는다.
+현재 시점의 보수적 운영 기준은 아래와 같다.
 
-## 10. 권장 작업 순서
-
-실무에서는 아래 순서를 권장한다.
-
-1. 대상 프로젝트 백업 또는 브랜치 생성
-2. 변환 전 빌드 및 주요 기능 체크
-3. `mvn rewrite:dryRun` 실행
-4. 결과 검토
-5. `mvn rewrite:run` 실행
-6. 컴파일 오류 수정
-7. XML / DAO / datasource / logging 수동 보완
-8. 통합 테스트 및 주요 기능 검증
-
-## 11. 추가 보완 후보
-
-향후 문서 또는 레시피 측면에서 보완할 수 있는 항목은 다음과 같다.
-
-- `pom.xml` 주석 인코딩 정리
-- `rewrite_mapping_sample.md` 한글 깨짐 복구
-- 자동 변환 대상/제외 대상을 표 형식으로 재정리
-- 샘플 프로젝트 기준 Before/After 예시 추가
-- `dryRun` 결과 해석 예시 추가
-
-## 12. 관련 파일
-
-- 진입점 레시피: [rewrite.yml](/C:/project/egov-migration-tool/rules/phase1-openrewrite/rewrite.yml)
-- Maven 설정: [pom.xml](/C:/project/egov-migration-tool/pom.xml)
-- POM 분리 설계안: [01.pom-dependency-migration.yml](/C:/project/egov-migration-tool/rules/phase1-openrewrite/01.pom-dependency-migration.yml)
-- Java 분리 설계안: [02.java-migration.yml](/C:/project/egov-migration-tool/rules/phase1-openrewrite/02.java-migration.yml)
-- XML 분리 설계안: [03.xml-migration.yml](/C:/project/egov-migration-tool/rules/phase1-openrewrite/03.xml-migration.yml)
+1. JDK 8 사용
+2. 로컬 Nexus mirror 사용
+3. POM 전환은 `pom/egovframe-coordinates.yml` 기준으로 수행
+4. 명령은 `dryRunNoFork -> runNoFork -> validate -> dependency:tree` 순서 사용
+5. `01/02/03` 파일은 직접 실행용보다 참조용으로 간주

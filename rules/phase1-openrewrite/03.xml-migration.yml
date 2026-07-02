@@ -5,6 +5,9 @@ description: >
   Composite XML migration recipe for eGovFrame 3.1 to 4.3.
   This phase only includes conservative text-level XML changes that are
   considered low risk without project-specific runtime verification.
+  Reference-only in the current execution flow. Prefer
+  rules/phase1-openrewrite/rewrite.yml as the actual configLocation entry
+  point for integrated execution.
 
 recipeList:
   - egov.migration.phase1.xml.EgovXmlPackageRenames
