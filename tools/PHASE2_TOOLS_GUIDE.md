@@ -11,7 +11,35 @@
 * `../README.md`
 * `../docs/migration-process.md`
 * `CONVERSION_ARCHITECTURE.md`
+* `MAPPER_LOCATIONS_HELPER.md`
 * `SQLMAPCLIENT_USAGE_ANALYZER.md`
+
+---
+
+## 문서 구분
+
+### 기본 실행 문서
+
+* `PHASE2_TOOLS_GUIDE.md`
+  Phase2 실행 절차, 입력/출력 경로, `run_phase2` 예시를 확인할 때 가장 먼저 보는 문서
+
+### 중요 참고 문서
+
+* `CONVERSION_ARCHITECTURE.md`
+  `discover/classify/transform/postcheck/report` 구조와 변환 원칙을 설명하는 설계 문서
+
+### 상황별 선택 문서
+
+* `SQLMAPCLIENT_USAGE_ANALYZER.md`
+  `sqlMapClient` 사용처가 많거나 DAO / Spring XML 영향 범위를 먼저 분석해야 할 때 참고
+* `MAPPER_LOCATIONS_HELPER.md`
+  DB 타입별 `mapperLocations` 확장이나 helper 사용이 필요한 경우 참고
+
+권장 읽기 순서:
+
+1. `PHASE2_TOOLS_GUIDE.md`
+2. `CONVERSION_ARCHITECTURE.md`
+3. 필요 시 `SQLMAPCLIENT_USAGE_ANALYZER.md`, `MAPPER_LOCATIONS_HELPER.md`
 
 ---
 
@@ -19,8 +47,10 @@
 
 ```text
 tools/
-├── README.MD
+├── PHASE2_TOOLS_GUIDE.md
 ├── CONVERSION_ARCHITECTURE.md
+├── MAPPER_LOCATIONS_HELPER.md
+├── SQLMAPCLIENT_USAGE_ANALYZER.md
 ├── inventory/
 │   └── collect_inventory.py
 ├── analysis/
@@ -128,7 +158,7 @@ output/reports/
 필수 입력:
 
 * `--source-root`
-  원본 프로젝트 루트
+  Phase1 최종 적용 소스 루트
 * `--working-root`
   변환 작업 디렉터리
 * `--report-root`
@@ -143,13 +173,13 @@ output/reports/
 * `--db-type`
   `mapperLocations` 확장이 필요한 경우 DB 타입
 * `--copy-source`
-  원본을 작업 디렉터리로 복사한 뒤 변환 수행
+  Phase1 적용 완료본을 작업 디렉터리로 복사한 뒤 변환 수행
 
 ### 2. 기본 실행
 
 ```bash
 python -m tools.conversion.run_phase2 ^
-  --source-root samples/asis/hello-egov-board ^
+  --source-root converted/phase1/hello-egov-board ^
   --working-root converted/phase2/hello-egov-board ^
   --report-root output/reports/hello-egov-board ^
   --copy-source
@@ -159,7 +189,7 @@ python -m tools.conversion.run_phase2 ^
 
 ```bash
 python -m tools.conversion.run_phase2 ^
-  --source-root samples/asis/hello-egov-board ^
+  --source-root converted/phase1/hello-egov-board ^
   --working-root converted/phase2/hello-egov-board ^
   --report-root output/reports/hello-egov-board ^
   --dao-analysis-json output/reports/dao-pattern-analysis.json ^
@@ -201,10 +231,11 @@ output/reports/<run-name>/
 ## 권장 운영 방식
 
 1. `inventory`로 AS-IS 범위를 먼저 수집한다.
-2. `analysis`로 DAO와 `sqlMapClient` 위험 영역을 분류한다.
-3. `run_phase2`로 규칙 기반 변환을 수행한다.
-4. `phase2-report.md`를 보고 수동 검토 대상을 정리한다.
-5. 반복되는 예외는 규칙으로 환류한다.
+2. Phase1 결과 소스를 `converted/phase1/<project>/` 기준으로 확정한다.
+3. `analysis`로 DAO와 `sqlMapClient` 위험 영역을 분류한다.
+4. `run_phase2`로 규칙 기반 변환을 수행한다.
+5. `phase2-report.md`를 보고 수동 검토 대상을 정리한다.
+6. 반복되는 예외는 규칙으로 환류한다.
 
 ---
 

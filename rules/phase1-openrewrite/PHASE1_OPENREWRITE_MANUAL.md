@@ -298,6 +298,21 @@ mvn -f samples/asis/hello-egov-board/pom.xml dependency:tree
 * 의존성 해석 결과가 POM 단계에서 의도한 `org.egovframe.rte` 좌표로 유지되는지 확인
 * 최종 patch 는 `output/rewrite-patches/` 에 별도 보관하고 Phase1 종료 산출물로 남긴다
 
+Phase2 연계를 위한 최종 소스 보관:
+
+* Phase1 `runNoFork` 와 후속 검증이 끝난 최종 적용 소스는 `converted/phase1/<project>/` 에 별도 보관하는 것을 권장한다.
+* 이 디렉터리는 Phase2의 기본 `--source-root` 로 사용한다.
+
+예시:
+
+```powershell
+New-Item -ItemType Directory -Force converted/phase1 | Out-Null
+Copy-Item `
+  samples/asis/hello-egov-board `
+  converted/phase1/hello-egov-board `
+  -Recurse -Force
+```
+
 ## 6. 이번 검증에서 실제 반영된 변경
 
 샘플 프로젝트 기준으로 아래 변경이 정상 반영되었다.

@@ -62,7 +62,8 @@ Phase1은 전후 매핑이 명확한 저위험 구조 변환 단계다. OpenRewr
 2. OpenRewrite 규칙 적용
 3. `pom.xml` 및 import 변경 결과 검토
 4. 대량 치환 후 잔존 패턴 스캔
-5. 변환 로그와 변경 파일 목록 정리
+5. `validate` / `compile` 등 후속 검증 수행
+6. patch 백업과 최종 적용 소스 기준본 정리
 
 ### 입력물
 
@@ -73,7 +74,15 @@ Phase1은 전후 매핑이 명확한 저위험 구조 변환 단계다. OpenRewr
 
 ```text
 converted/phase1/
+output/rewrite-patches/
 ```
+
+설명:
+
+* `converted/phase1/<project>/`
+  Phase1 `runNoFork`와 후속 검증까지 끝난 최종 적용 소스 기준본
+* `output/rewrite-patches/`
+  dry run / run 수행 시 생성된 patch 백업본
 
 ### 검증 포인트
 
@@ -86,6 +95,8 @@ converted/phase1/
 ## Phase2 수행절차
 
 Phase2는 Python 프로그램이 주도하는 규칙 기반 구조 변환 단계다. DAO, SQL Map, Spring XML처럼 단순 치환으로 끝나지 않는 항목을 다룬다.
+
+실행 예시, 입력/출력 경로, `run_phase2` 옵션은 [PHASE2_TOOLS_GUIDE.md](/C:/project/egov-migration-tool/tools/PHASE2_TOOLS_GUIDE.md)를 함께 참고한다.
 
 ### 목적
 
@@ -105,7 +116,7 @@ Phase2는 Python 프로그램이 주도하는 규칙 기반 구조 변환 단계
 
 ### 기본 수행 순서
 
-1. 원본 소스와 작업 디렉터리 준비
+1. Phase1 최종 적용 소스와 작업 디렉터리 준비
 2. 필요 시 분석 JSON 생성
 3. Phase2 변환 실행
 4. 변환 보고서 검토
@@ -199,7 +210,7 @@ org.mybatis.spring.SqlSessionFactoryBean
 
 ```bash
 python -m tools.conversion.run_phase2 ^
-  --source-root samples/asis/hello-egov-board ^
+  --source-root converted/phase1/hello-egov-board ^
   --working-root converted/phase2/hello-egov-board ^
   --report-root output/reports/hello-egov-board ^
   --copy-source
@@ -209,7 +220,7 @@ python -m tools.conversion.run_phase2 ^
 
 ```bash
 python -m tools.conversion.run_phase2 ^
-  --source-root samples/asis/hello-egov-board ^
+  --source-root converted/phase1/hello-egov-board ^
   --working-root converted/phase2/hello-egov-board ^
   --report-root output/reports/hello-egov-board ^
   --dao-analysis-json output/reports/dao-pattern-analysis.json ^
@@ -219,7 +230,7 @@ python -m tools.conversion.run_phase2 ^
 
 ### 입력물
 
-* 원본 프로젝트
+* 기본 입력: Phase1 최종 적용 소스 (`converted/phase1/<project>/`)
 * 선택 입력: DAO 분석 JSON
 * 선택 입력: sqlMapClient 분류 JSON
 

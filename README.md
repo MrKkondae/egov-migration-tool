@@ -29,7 +29,7 @@ AS-IS 분석
   OpenRewrite 기반 Phase1 실행 절차
 * `nexus/Nexus_구축가이드.md`
   로컬 Nexus 구축 및 Maven 미러 설정
-* `tools/README.MD`
+* `tools/PHASE2_TOOLS_GUIDE.md`
   Python 기반 도구 실행 방법
 
 ## Phase 정의
@@ -92,15 +92,20 @@ LLM 기반 예외 보정 단계다.
 
 ## 산출물 기준
 
-* Phase1 결과물: `rules/phase1-openrewrite/`, `converted/phase1/`
+* Phase1 결과물: `rules/phase1-openrewrite/`, `converted/phase1/`, `output/rewrite-patches/`
 * Phase2 결과물: `converted/phase2/`, `output/reports/`, `output/logs/`
 * 공통 검증 결과: `output/logs/`, `output/reports/`
+
+운영 기준:
+
+* `converted/phase1/<project>/` 는 Phase1 적용 및 검증 완료 후 보관한 최종 소스 기준본이다.
+* Phase2는 기본적으로 이 `converted/phase1/<project>/` 를 입력 소스로 사용한다.
 
 ## 세부 문서
 
 * [전환 수행 절차](./docs/migration-process.md)
 * [OpenRewrite Phase1 매뉴얼](./rules/phase1-openrewrite/PHASE1_OPENREWRITE_MANUAL.md)
 * [로컬 Nexus 구축 가이드](./nexus/Nexus_구축가이드.md)
-* [도구 사용 안내](./tools/README.MD)
+* [도구 사용 안내](./tools/PHASE2_TOOLS_GUIDE.md)
 * [전환 아키텍처](./tools/CONVERSION_ARCHITECTURE.md)
 * [sqlMapClient 분석기 문서](./tools/SQLMAPCLIENT_USAGE_ANALYZER.md)
