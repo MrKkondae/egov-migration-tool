@@ -196,6 +196,74 @@ mvn -f samples/asis/hello-egov-board/pom.xml dependency:tree
 3. XML 레시피 검증
 4. 검증 완료 후 미사용 레시피 재정리
 
+### 10.1 Java / XML 검증 순서 권장안
+
+현재 기준에서는 XML보다 Java를 먼저 검증하는 편이 안전하다.
+
+이유:
+
+* Java 단계는 주로 `import`, type, package 치환 중심이라 변경 범위가 비교적 선명하다.
+* XML 단계는 Spring bean class, validator, servlet 설정, id generator, sql-map 연계 등 런타임 영향 범위가 더 넓다.
+* 따라서 초기 샘플 검증은 `Java -> XML -> Full` 순서로 나누어 보는 것이 원인 분리에 유리하다.
+
+권장 순서:
+
+1. Java dry run
+2. Java patch 검토 및 필요 시 실제 반영
+3. XML dry run
+4. XML patch 검토 및 필요 시 실제 반영
+5. 마지막에 통합 dry run 또는 통합 run 검토
+
+### 10.2 Java patch 검토 시 패키지 구분 기준
+
+샘플 프로젝트에서는 아래 두 패키지가 시각적으로 비슷해 혼동하기 쉽다.
+
+* `egovframework.com...`
+* `egovframework.rte...`
+
+검토 기준:
+
+* `egovframework.com...` 은 샘플 애플리케이션 소스 패키지로 간주하고 자동 치환 대상으로 보지 않는다.
+* `egovframework.rte...` 은 eGovFrame runtime / framework 패키지이므로 `org.egovframe.rte...` 치환 대상이다.
+
+즉 patch 검토 시에는 `egovframework.com` 과 `egovframework.rte` 를 반드시 분리해서 본다.
+
+### 10.3 `rewrite.patch` 보관 규칙
+
+`dryRunNoFork` 를 다시 실행하면 `target/rewrite/rewrite.patch` 는 다음 실행 결과로 덮어써진다.
+따라서 각 단계 실행 직후 patch 를 별도 위치로 즉시 복사해 보관하는 것을 권장한다.
+
+권장 보관 폴더:
+
+* `output/rewrite-patches/`
+
+권장 파일명 규칙:
+
+* `{project}-{phase}-{mode}-{yyyymmdd}-{seq}.patch`
+
+예시:
+
+* `hello-egov-board-java-dryrun-20260702-01.patch`
+* `hello-egov-board-xml-dryrun-20260702-01.patch`
+* `hello-egov-board-full-dryrun-20260702-01.patch`
+
+권장 절차:
+
+1. dry run 실행
+2. `samples/asis/hello-egov-board/target/rewrite/rewrite.patch` 생성 확인
+3. 즉시 `output/rewrite-patches/` 아래로 복사
+4. 복사본 기준으로 patch 검토
+
+예시 명령:
+
+```powershell
+New-Item -ItemType Directory -Force output/rewrite-patches | Out-Null
+
+Copy-Item `
+  samples/asis/hello-egov-board/target/rewrite/rewrite.patch `
+  output/rewrite-patches/hello-egov-board-java-dryrun-20260702-01.patch
+```
+
 ## 11. 진입점 역할 구분
 
 현재 문서 기준으로 혼동하기 쉬운 두 파일의 역할은 아래와 같다.
