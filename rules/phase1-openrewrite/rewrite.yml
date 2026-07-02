@@ -541,7 +541,12 @@ recipeList:
   - org.openrewrite.text.FindAndReplace:
       find: egovframework.rte
       replace: org.egovframe.rte
-      filePattern: "**/*.xml"
+      filePattern: "**/src/main/resources/**/*.xml"
+
+  - org.openrewrite.text.FindAndReplace:
+      find: egovframework.rte
+      replace: org.egovframe.rte
+      filePattern: "**/src/main/webapp/**/*.xml"
 
 ---
 type: specs.openrewrite.org/v1beta/recipe
@@ -554,4 +559,9 @@ recipeList:
   - org.openrewrite.text.FindAndReplace:
       find: MappingJacksonHttpMessageConverter
       replace: MappingJackson2HttpMessageConverter
-      filePattern: "**/*.xml"
+      filePattern: "**/src/main/resources/**/*.xml"
+
+  - org.openrewrite.text.FindAndReplace:
+      find: MappingJacksonHttpMessageConverter
+      replace: MappingJackson2HttpMessageConverter
+      filePattern: "**/src/main/webapp/**/*.xml"

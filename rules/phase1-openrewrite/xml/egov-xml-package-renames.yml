@@ -11,4 +11,9 @@ recipeList:
   - org.openrewrite.text.FindAndReplace:
       find: egovframework.rte
       replace: org.egovframe.rte
-      filePattern: "**/*.xml"
+      filePattern: "**/src/main/resources/**/*.xml"
+
+  - org.openrewrite.text.FindAndReplace:
+      find: egovframework.rte
+      replace: org.egovframe.rte
+      filePattern: "**/src/main/webapp/**/*.xml"

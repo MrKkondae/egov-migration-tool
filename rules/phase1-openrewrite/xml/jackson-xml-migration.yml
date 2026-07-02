@@ -10,4 +10,9 @@ recipeList:
   - org.openrewrite.text.FindAndReplace:
       find: MappingJacksonHttpMessageConverter
       replace: MappingJackson2HttpMessageConverter
-      filePattern: "**/*.xml"
+      filePattern: "**/src/main/resources/**/*.xml"
+
+  - org.openrewrite.text.FindAndReplace:
+      find: MappingJacksonHttpMessageConverter
+      replace: MappingJackson2HttpMessageConverter
+      filePattern: "**/src/main/webapp/**/*.xml"
